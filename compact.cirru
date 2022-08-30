@@ -15,12 +15,33 @@
                 :fragment-shader $ inline-shader "\"wave.frag"
                 :attributes $ {}
                   :idx $ range 100000
+              let
+                  r 200
+                  da $ * &PI 0.01
+                  pieces 14
+                  d-theta $ / (* &PI 2) pieces
+                  segments 40
+                group ({}) & $ -> (range pieces)
+                  map $ fn (p-idx)
+                    comp-tube $ {} (:circle-step 20) (:radius 4)
+                      :brush $ [] 4 4
+                      :curve $ -> (range segments)
+                        map $ fn (idx)
+                          let
+                              a0 $ * p-idx d-theta
+                              angle $ + a0 (* idx da)
+                              ri $ / (* r idx) segments
+                            []
+                              * ri $ cos angle
+                              * ri $ sin angle
+                              , 0
       :ns $ quote
         ns app.comp.container $ :require ("\"twgl.js" :as twgl)
           app.config :refer $ inline-shader
-          triadica.alias :refer $ object
+          triadica.alias :refer $ object group
           triadica.math :refer $ &v+
           triadica.core :refer $ %nested-attribute >>
+          triadica.comp.tube :refer $ comp-tube comp-brush
     |app.config $ {}
       :defs $ {}
         |inline-shader $ quote
