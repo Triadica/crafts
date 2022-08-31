@@ -16,23 +16,25 @@
                 :attributes $ {}
                   :idx $ range 100000
               let
-                  r 200
+                  r 420
                   da $ * &PI 0.01
-                  pieces 16
+                  pieces 24
                   d-theta $ / (* &PI 2) pieces
-                  segments 120
+                  segments 8
                 group ({}) & $ -> (range pieces)
                   map $ fn (p-idx)
-                    comp-tube $ {} (:circle-step 20) (:radius 4)
+                    comp-tube $ {} (:circle-step 20) (:radius 6)
                       :vertex-shader $ inline-shader "\"vortex.vert"
                       :fragment-shader $ inline-shader "\"vortex.frag"
-                      :brush $ [] 4 4
+                      :brush $ [] 16 0
+                      :brush2 $ [] 6 4
                       :curve $ -> (range segments)
                         map $ fn (idx)
                           let
                               a0 $ * p-idx d-theta
                               angle $ + a0 (* idx da)
-                              ri $ / (* r idx) segments
+                              ri $ + 16
+                                / (* r idx) segments
                             {}
                               :position $ []
                                 * ri $ cos angle
@@ -40,7 +42,7 @@
                                 , 0
                               :angle angle
                               :radius ri
-                      :get-uniforms $ fn ()
+                      ; :get-uniforms $ fn ()
                         js-object $ :time
                           &* 0.001 $ - (js/Date.now) start-time
         |start-time $ quote
