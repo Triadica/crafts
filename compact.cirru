@@ -10,7 +10,7 @@
           defn comp-container (store)
             let
                 states $ :states store
-              object $ {} (:draw-mode :line-strip)
+              ; object $ {} (:draw-mode :line-strip)
                 :vertex-shader $ inline-shader "\"wave.vert"
                 :fragment-shader $ inline-shader "\"wave.frag"
                 :attributes $ {}
@@ -21,14 +21,14 @@
                   pieces 24
                   d-theta $ / (* &PI 2) pieces
                   segments 8
-                group ({}) & $ -> (range pieces)
-                  map $ fn (p-idx)
-                    comp-tube $ {} (:circle-step 20) (:radius 6)
-                      :vertex-shader $ inline-shader "\"vortex.vert"
-                      :fragment-shader $ inline-shader "\"vortex.frag"
-                      :brush $ [] 16 0
-                      :brush2 $ [] 6 4
-                      :curve $ -> (range segments)
+                comp-tube $ {} (; :draw-mode :line-strip) (:circle-step 20) (:radius 6)
+                  :vertex-shader $ inline-shader "\"vortex.vert"
+                  :fragment-shader $ inline-shader "\"vortex.frag"
+                  :brush $ [] 16 0
+                  :brush2 $ [] 6 4
+                  :curve $ -> (range pieces)
+                    map $ fn (p-idx)
+                      -> (range segments)
                         map $ fn (idx)
                           let
                               a0 $ * p-idx d-theta
@@ -42,9 +42,9 @@
                                 , 0
                               :angle angle
                               :radius ri
-                      ; :get-uniforms $ fn ()
-                        js-object $ :time
-                          &* 0.001 $ - (js/Date.now) start-time
+                  ; :get-uniforms $ fn ()
+                    js-object $ :time
+                      &* 0.001 $ - (js/Date.now) start-time
         |start-time $ quote
           def start-time $ js/Date.now
       :ns $ quote
