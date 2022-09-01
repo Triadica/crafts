@@ -13,7 +13,14 @@ varying float v_radius;
 
 void main() {
 
-  float a = snoise(vec2(v_angle, v_radius * 0.02 + v_time * 0.8));
+  // float a_deg = v_time * 0.0001;
+  // vec2 a_pos = vec2(v_angle * cos(a_deg) * 1., 2. * v_angle * sin(a_deg));
+  // float a = snoise(a_pos);
 
-  gl_FragColor = vec4(hsl2rgb(0.26, 0.9, 0.2 + a * 0.8), 1.0);
+  float t = v_time * 0.2;
+  float d_a = v_angle * 0.6;
+  float a = snoise(vec2(d_a, v_radius * 0.006 + t));
+  float b = snoise(vec2(d_a + t, v_radius * 0.006));
+
+  gl_FragColor = vec4(hsl2rgb(0.8 + 0.26 * b, 0.7, 0.4 + a * 0.7), 1.0);
 }
