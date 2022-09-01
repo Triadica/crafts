@@ -15,36 +15,71 @@
                 :fragment-shader $ inline-shader "\"wave.frag"
                 :attributes $ {}
                   :idx $ range 100000
-              let
-                  r 420
-                  da $ * &PI 0.01
-                  pieces 24
-                  d-theta $ / (* &PI 2) pieces
-                  segments 8
-                comp-tube $ {} (; :draw-mode :line-strip) (:circle-step 20) (:radius 6)
-                  :vertex-shader $ inline-shader "\"vortex.vert"
-                  :fragment-shader $ inline-shader "\"vortex.frag"
-                  :brush $ [] 16 0
-                  :brush2 $ [] 6 4
-                  :curve $ -> (range pieces)
-                    map $ fn (p-idx)
-                      -> (range segments)
-                        map $ fn (idx)
-                          let
-                              a0 $ * p-idx d-theta
-                              angle $ + a0 (* idx da)
-                              ri $ + 16
-                                / (* r idx) segments
-                            {}
-                              :position $ []
-                                * ri $ cos angle
-                                * ri $ sin angle
-                                , 0
-                              :angle angle
-                              :radius ri
-                  ; :get-uniforms $ fn ()
-                    js-object $ :time
-                      &* 0.001 $ - (js/Date.now) start-time
+              ; comp-tube-demo
+              comp-mesh-demo
+        |comp-mesh-demo $ quote
+          defn comp-mesh-demo () $ let
+              r 200
+              da $ * &PI 0.01
+              pieces 4
+              d-theta $ / (* &PI 2) pieces
+              segments 16
+              lines-grid $ -> (range-bothway pieces)
+                mapcat $ fn (i)
+                  -> (range-bothway pieces)
+                    map $ fn (j) ([] i j)
+            comp-tube $ {} (:draw-mode :line-strip) (:circle-step 6) (:radius 10)
+              :vertex-shader $ inline-shader "\"lines.vert"
+              :fragment-shader $ inline-shader "\"lines.frag"
+              :curve $ -> lines-grid
+                map $ fn (base)
+                  -> (range segments)
+                    map $ fn (idx)
+                      let
+                          a0 0
+                          angle $ + a0 (* idx da)
+                          ri $ + 16
+                            / (* r idx) segments
+                        {}
+                          :position $ []
+                            +
+                              * 40 $ nth base 0
+                              * ri $ sin angle
+                            * ri $ cos angle
+                            * 40 $ nth base 1
+                          :angle angle
+                          :radius ri
+        |comp-tube-demo $ quote
+          defn comp-tube-demo () $ let
+              r 420
+              da $ * &PI 0.01
+              pieces 24
+              d-theta $ / (* &PI 2) pieces
+              segments 8
+            comp-tube $ {} (; :draw-mode :line-strip) (:circle-step 20) (:radius 6)
+              :vertex-shader $ inline-shader "\"vortex.vert"
+              :fragment-shader $ inline-shader "\"vortex.frag"
+              :brush $ [] 16 0
+              :brush2 $ [] 6 4
+              :curve $ -> (range pieces)
+                map $ fn (p-idx)
+                  -> (range segments)
+                    map $ fn (idx)
+                      let
+                          a0 $ * p-idx d-theta
+                          angle $ + a0 (* idx da)
+                          ri $ + 16
+                            / (* r idx) segments
+                        {}
+                          :position $ []
+                            * ri $ cos angle
+                            * ri $ sin angle
+                            , 0
+                          :angle angle
+                          :radius ri
+              ; :get-uniforms $ fn ()
+                js-object $ :time
+                  &* 0.001 $ - (js/Date.now) start-time
         |start-time $ quote
           def start-time $ js/Date.now
       :ns $ quote
