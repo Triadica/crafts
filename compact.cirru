@@ -6,6 +6,7 @@
   :files $ {}
     |app.comp.container $ {}
       :defs $ {}
+        |*triangle-counter $ quote (defatom *triangle-counter 0)
         |comp-container $ quote
           defn comp-container (store)
             let
@@ -19,7 +20,7 @@
               comp-mesh-demo
         |comp-mesh-demo $ quote
           defn comp-mesh-demo () $ let
-              r 200
+              r 100
               da $ * &PI 0.01
               pieces 4
               d-theta $ / (* &PI 2) pieces
@@ -28,7 +29,7 @@
                 mapcat $ fn (i)
                   -> (range-bothway pieces)
                     map $ fn (j) ([] i j)
-            comp-tube $ {} (:draw-mode :line-strip) (:circle-step 6) (:radius 10)
+            comp-tube $ {} (; :draw-mode :line-strip) (:circle-step 7) (:radius 16)
               :vertex-shader $ inline-shader "\"lines.vert"
               :fragment-shader $ inline-shader "\"lines.frag"
               :curve $ -> lines-grid
@@ -40,15 +41,21 @@
                           angle $ + a0 (* idx da)
                           ri $ + 16
                             / (* r idx) segments
-                        {}
-                          :position $ []
+                        {} $ :position
+                          []
                             +
-                              * 40 $ nth base 0
-                              * ri $ sin angle
-                            * ri $ cos angle
-                            * 40 $ nth base 1
-                          :angle angle
-                          :radius ri
+                              * 80 $ nth base 0
+                              ; * ri $ sin angle
+                            * idx 10
+                            +
+                              * 80 $ nth base 1
+                              ; * ri $ cos angle
+              :post-hook $ fn (d)
+                map d $ fn (di)
+                  let
+                      idx $ triangle-idx!
+                    assoc di :idx $ floor
+                      - (/ idx 3) 3
         |comp-tube-demo $ quote
           defn comp-tube-demo () $ let
               r 420
@@ -82,6 +89,11 @@
                   &* 0.001 $ - (js/Date.now) start-time
         |start-time $ quote
           def start-time $ js/Date.now
+        |triangle-idx! $ quote
+          defn triangle-idx! () $ let
+              v @*triangle-counter
+            swap! *triangle-counter inc
+            , v
       :ns $ quote
         ns app.comp.container $ :require ("\"twgl.js" :as twgl)
           app.config :refer $ inline-shader
@@ -137,7 +149,7 @@
               hud! "\"ok~" "\"OK"
             hud! "\"error" build-errors
         |render-app! $ quote
-          defn render-app! ()
+          defn render-app! () (reset! *triangle-counter 0)
             load-objects! (comp-container @*store) dispatch!
             paint-canvas!
       :ns $ quote
@@ -147,4 +159,4 @@
           touch-control.core :refer $ render-control! start-control-loop! replace-control-loop!
           triadica.core :refer $ on-control-event load-objects! paint-canvas! setup-mouse-events! reset-canvas-size! update-states
           triadica.global :refer $ *gl-context
-          app.comp.container :refer $ comp-container
+          app.comp.container :refer $ comp-container *triangle-counter
