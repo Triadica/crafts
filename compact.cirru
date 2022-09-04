@@ -17,7 +17,42 @@
                 :attributes $ {}
                   :idx $ range 100000
               ; comp-tube-demo
-              comp-mesh-demo
+              ; comp-mesh-demo
+              comp-fibers-demo
+        |comp-fibers-demo $ quote
+          defn comp-fibers-demo () $ let
+              segments 20
+            comp-tube $ {} (; :draw-mode :line-strip) (:circle-step 20) (:radius 1)
+              :vertex-shader $ inline-shader "\"fibers.vert"
+              :fragment-shader $ inline-shader "\"fibers.frag"
+              :brush $ [] 16 0
+              :brush2 $ [] 6 4
+              :curve $ -> fibers-grid
+                map $ fn (xy)
+                  -> (range segments)
+                    map $ fn (idx)
+                      let
+                          x $ nth xy 0
+                          y $ nth xy 1
+                          ratio $ / idx segments
+                          rr $ + 0.1 (* ratio ratio)
+                          decay $ - 1
+                            /
+                              + (pow x 2) (pow y 2)
+                              , 500
+                        {}
+                          :position $ [] (* 40 idx decay)
+                            +
+                              * 0.4 $ * idx idx
+                              * x 20 rr
+                            +
+                              * 40 $ sin (* 0.1 idx)
+                              * y 20 rr
+                          :idx ratio
+                          :xy xy
+              ; :get-uniforms $ fn ()
+                js-object $ :time
+                  &* 0.001 $ - (js/Date.now) start-time
         |comp-mesh-demo $ quote
           defn comp-mesh-demo () $ let
               r 100
@@ -87,6 +122,19 @@
               ; :get-uniforms $ fn ()
                 js-object $ :time
                   &* 0.001 $ - (js/Date.now) start-time
+        |fibers-grid $ quote
+          def fibers-grid $ let
+              size 8
+            -> (range-bothway size)
+              mapcat $ fn (x)
+                -> (range-bothway size)
+                  map $ fn (y) ([] x y)
+              filter $ fn (xy)
+                <=
+                  +
+                    pow (nth xy 0) 2
+                    pow (nth xy 1) 2
+                  * 8 8
         |start-time $ quote
           def start-time $ js/Date.now
         |triangle-idx! $ quote
