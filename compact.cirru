@@ -1,25 +1,74 @@
 
 {} (:package |app)
   :configs $ {} (:init-fn |app.main/main!) (:reload-fn |app.main/reload!) (:version |0.0.1)
-    :modules $ [] |touch-control/ |respo.calcit/ |triadica-space/ |quaternion/
+    :modules $ [] |touch-control/ |respo.calcit/ |triadica-space/ |quaternion/ |memof/
   :entries $ {}
   :files $ {}
     |app.comp.container $ {}
       :defs $ {}
+        |*triangle-counter $ quote (defatom *triangle-counter 0)
         |comp-container $ quote
           defn comp-container (store)
             let
                 states $ :states store
-              ; object $ {} (:draw-mode :line-strip)
-                :vertex-shader $ inline-shader "\"wave.vert"
-                :fragment-shader $ inline-shader "\"wave.frag"
-                :attributes $ {}
-                  :idx $ range 100000
-              ; comp-tube-demo
-              comp-mesh-demo
+              ; comp-mesh-demo
+              group ({})
+                comp-tabs
+                  {}
+                    :position $ [] -40 0 0
+                    :selected $ :tab store
+                  , tab-entries
+                case-default (:tab store)
+                  do
+                    js/console.warn "\"Unknown tab:" $ :tab store
+                    comp-axis
+                  :axis $ comp-axis
+                  :wave $ object
+                    {} (:draw-mode :line-strip)
+                      :vertex-shader $ inline-shader "\"wave.vert"
+                      :fragment-shader $ inline-shader "\"wave.frag"
+                      :attributes $ {}
+                        :idx $ range 100000
+                  :tube $ comp-tube-demo
+                  :mesh $ comp-mesh-demo
+                  :fibers $ comp-fibers-demo
+        |comp-fibers-demo $ quote
+          defn comp-fibers-demo () $ let
+              segments 20
+            comp-tube $ {} (; :draw-mode :line-strip) (:circle-step 20) (:radius 1)
+              :vertex-shader $ inline-shader "\"fibers.vert"
+              :fragment-shader $ inline-shader "\"fibers.frag"
+              :brush $ [] 16 0
+              :brush2 $ [] 6 4
+              :curve $ -> fibers-grid
+                map $ fn (xy)
+                  -> (range segments)
+                    map $ fn (idx)
+                      let
+                          x $ nth xy 0
+                          y $ nth xy 1
+                          ratio $ / idx segments
+                          rr $ + 0.1 (* ratio ratio)
+                          decay $ - 1
+                            /
+                              + (pow x 2) (pow y 2)
+                              , 500
+                        {}
+                          :position $ [] (* 40 idx decay)
+                            +
+                              * 0.4 $ * idx idx
+                              * x 20 rr
+                            +
+                              * 40 $ sin (* 0.1 idx)
+                              * y 20 rr
+                          :idx ratio
+                          :xy xy
+              ; :get-uniforms $ fn ()
+                js-object $ :time
+                  &* 0.001 $ - (js/Date.now) start-time
         |comp-mesh-demo $ quote
           defn comp-mesh-demo () $ let
-              r 200
+              r 100
               da $ * &PI 0.01
               pieces 4
               d-theta $ / (* &PI 2) pieces
@@ -28,7 +77,7 @@
                 mapcat $ fn (i)
                   -> (range-bothway pieces)
                     map $ fn (j) ([] i j)
-            comp-tube $ {} (:draw-mode :line-strip) (:circle-step 6) (:radius 10)
+            comp-tube $ {} (; :draw-mode :line-strip) (:circle-step 7) (:radius 16)
               :vertex-shader $ inline-shader "\"lines.vert"
               :fragment-shader $ inline-shader "\"lines.frag"
               :curve $ -> lines-grid
@@ -40,15 +89,21 @@
                           angle $ + a0 (* idx da)
                           ri $ + 16
                             / (* r idx) segments
-                        {}
-                          :position $ []
+                        {} $ :position
+                          []
                             +
-                              * 40 $ nth base 0
-                              * ri $ sin angle
-                            * ri $ cos angle
-                            * 40 $ nth base 1
-                          :angle angle
-                          :radius ri
+                              * 80 $ nth base 0
+                              ; * ri $ sin angle
+                            * idx 10
+                            +
+                              * 80 $ nth base 1
+                              ; * ri $ cos angle
+              :post-hook $ fn (d)
+                map d $ fn (di)
+                  let
+                      idx $ triangle-idx!
+                    assoc di :idx $ floor
+                      - (/ idx 3) 3
         |comp-tube-demo $ quote
           defn comp-tube-demo () $ let
               r 420
@@ -80,8 +135,38 @@
               ; :get-uniforms $ fn ()
                 js-object $ :time
                   &* 0.001 $ - (js/Date.now) start-time
+        |fibers-grid $ quote
+          def fibers-grid $ let
+              size 8
+            -> (range-bothway size)
+              mapcat $ fn (x)
+                -> (range-bothway size)
+                  map $ fn (y) ([] x y)
+              filter $ fn (xy)
+                <=
+                  +
+                    pow (nth xy 0) 2
+                    pow (nth xy 1) 2
+                  * 8 8
         |start-time $ quote
           def start-time $ js/Date.now
+        |tab-entries $ quote
+          def tab-entries $ []
+            {} (:key :axis)
+              :position $ [] -200 140 0
+            {} (:key :wave)
+              :position $ [] -200 100 0
+            {} (:key :tube)
+              :position $ [] -200 60 0
+            {} (:key :mesh)
+              :position $ [] -200 20 0
+            {} (:key :fibers)
+              :position $ [] -200 -20 0
+        |triangle-idx! $ quote
+          defn triangle-idx! () $ let
+              v @*triangle-counter
+            swap! *triangle-counter inc
+            , v
       :ns $ quote
         ns app.comp.container $ :require ("\"twgl.js" :as twgl)
           app.config :refer $ inline-shader
@@ -89,6 +174,8 @@
           triadica.math :refer $ &v+
           triadica.core :refer $ %nested-attribute >>
           triadica.comp.tube :refer $ comp-tube comp-brush
+          triadica.comp.tabs :refer $ comp-tabs
+          triadica.comp.axis :refer $ comp-axis
     |app.config $ {}
       :defs $ {}
         |inline-shader $ quote
@@ -100,6 +187,7 @@
         |*store $ quote
           defatom *store $ {}
             :states $ {}
+            :tab nil
         |canvas $ quote
           def canvas $ js/document.querySelector "\"canvas"
         |dispatch! $ quote
@@ -109,7 +197,8 @@
                 store @*store
                 next $ case-default op
                   do (js/console.warn "\"unknown op" op) nil
-                  :states $ update-states store ([] op data)
+                  :states $ update-states store data
+                  :tab-focus $ assoc store :tab data
                   :cube-right $ update store :v inc
               if (some? next) (reset! *store next)
         |main! $ quote
@@ -137,7 +226,7 @@
               hud! "\"ok~" "\"OK"
             hud! "\"error" build-errors
         |render-app! $ quote
-          defn render-app! ()
+          defn render-app! () (reset! *triangle-counter 0)
             load-objects! (comp-container @*store) dispatch!
             paint-canvas!
       :ns $ quote
@@ -147,4 +236,5 @@
           touch-control.core :refer $ render-control! start-control-loop! replace-control-loop!
           triadica.core :refer $ on-control-event load-objects! paint-canvas! setup-mouse-events! reset-canvas-size! update-states
           triadica.global :refer $ *gl-context
-          app.comp.container :refer $ comp-container
+          app.comp.container :refer $ comp-container *triangle-counter
+          triadica.comp.tabs :refer $ comp-tabs

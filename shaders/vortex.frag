@@ -22,5 +22,5 @@ void main() {
   float a = snoise(vec2(d_a, v_radius * 0.006 + t));
   float b = snoise(vec2(d_a + t, v_radius * 0.006));
 
-  gl_FragColor = vec4(hsl2rgb(0.8 + 0.26 * b, 0.7, 0.4 + a * 0.7), 1.0);
+  gl_FragColor = vec4(hsl2rgb(0.8 + 0.26 * b, 0.5 + a * 0.43, 0.4 + a * 0.7), 1.0);
 }
