@@ -7,17 +7,49 @@
     |app.comp.container $ {}
       :defs $ {}
         |*triangle-counter $ quote (defatom *triangle-counter 0)
+        |build-connections $ quote
+          defn build-connections (dots)
+            -> dots
+              mapcat $ fn (d1)
+                -> dots $ map
+                  fn (d2) ([] d1 d2)
+              filter $ fn (ab)
+                not= (nth ab 0) (nth ab 1)
+        |comp-connections-demo $ quote
+          defn comp-connections-demo () $ let
+              connections $ build-connections
+                map dots $ fn (d) (v-scale d 100)
+            comp-tube $ {} (; :draw-mode :line-strip) (:circle-step 20) (:radius 1)
+              :vertex-shader $ inline-shader "\"lines.vert"
+              :fragment-shader $ inline-shader "\"lines.frag"
+              :brush $ [] 16 0
+              :brush2 $ [] 6 4
+              :curve $ w-js-log
+                -> connections $ map
+                  fn (line)
+                    []
+                      {} $ :position (nth line 0)
+                      {} $ :position
+                        v-scale
+                          &v+ (nth line 0) (nth line 1)
+                          , 0.5
+                      {} $ :position (nth line 1)
+              :normal0 $ [] 1 2 0
+              ; :get-uniforms $ fn ()
+                js-object $ :time
+                  &* 0.001 $ - (js/Date.now) start-time
         |comp-container $ quote
           defn comp-container (store)
             let
                 states $ :states store
               ; comp-mesh-demo
               group ({})
-                comp-tabs
-                  {}
-                    :position $ [] -40 0 0
-                    :selected $ :tab store
-                  , tab-entries
+                if (not hide-tabs?)
+                  comp-tabs
+                    {}
+                      :position $ [] -40 0 0
+                      :selected $ :tab store
+                    , tab-entries
                 case-default (:tab store)
                   do
                     js/console.warn "\"Unknown tab:" $ :tab store
@@ -32,6 +64,7 @@
                   :tube $ comp-tube-demo
                   :mesh $ comp-mesh-demo
                   :fibers $ comp-fibers-demo
+                  :connections $ comp-connections-demo
         |comp-fibers-demo $ quote
           defn comp-fibers-demo () $ let
               segments 20
@@ -78,8 +111,8 @@
                   -> (range-bothway pieces)
                     map $ fn (j) ([] i j)
             comp-tube $ {} (; :draw-mode :line-strip) (:circle-step 7) (:radius 16)
-              :vertex-shader $ inline-shader "\"lines.vert"
-              :fragment-shader $ inline-shader "\"lines.frag"
+              :vertex-shader $ inline-shader "\"mesh.vert"
+              :fragment-shader $ inline-shader "\"mesh.frag"
               :curve $ -> lines-grid
                 map $ fn (base)
                   -> (range segments)
@@ -135,6 +168,8 @@
               ; :get-uniforms $ fn ()
                 js-object $ :time
                   &* 0.001 $ - (js/Date.now) start-time
+        |dots $ quote
+          def dots $ [] ([] 1 1 1) ([] 1 1 -1) ([] 1 -1 1) ([] 1 -1 -1) ([] -1 1 1) ([] -1 1 -1) ([] -1 -1 1) ([] -1 -1 -1) ([] 0 0 1.414) ([] 0 0 -1.414) ([] 0 1.414 0) ([] 0 -1.414 0) ([] 1.414 0 0) ([] -1.414 0 0)
         |fibers-grid $ quote
           def fibers-grid $ let
               size 8
@@ -162,6 +197,8 @@
               :position $ [] -200 20 0
             {} (:key :fibers)
               :position $ [] -200 -20 0
+            {} (:key :connections)
+              :position $ [] -200 -60 0
         |triangle-idx! $ quote
           defn triangle-idx! () $ let
               v @*triangle-counter
@@ -169,15 +206,19 @@
             , v
       :ns $ quote
         ns app.comp.container $ :require ("\"twgl.js" :as twgl)
-          app.config :refer $ inline-shader
+          app.config :refer $ inline-shader hide-tabs?
+          triadica.config :as t-config
           triadica.alias :refer $ object group
           triadica.math :refer $ &v+
           triadica.core :refer $ %nested-attribute >>
           triadica.comp.tube :refer $ comp-tube comp-brush
           triadica.comp.tabs :refer $ comp-tabs
           triadica.comp.axis :refer $ comp-axis
+          quaternion.core :refer $ &v+ v-scale
     |app.config $ {}
       :defs $ {}
+        |hide-tabs? $ quote
+          def hide-tabs? $ = "\"true" (get-env "\"hide-tabs" "\"false")
         |inline-shader $ quote
           defmacro inline-shader (file) (println "\"inline shader file:" file)
             read-file $ str "\"shaders/" file
@@ -187,7 +228,7 @@
         |*store $ quote
           defatom *store $ {}
             :states $ {}
-            :tab nil
+            :tab $ turn-keyword (get-env "\"tab" "\"axis")
         |canvas $ quote
           def canvas $ js/document.querySelector "\"canvas"
         |dispatch! $ quote
