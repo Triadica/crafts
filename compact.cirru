@@ -1,7 +1,7 @@
 
 {} (:package |app)
   :configs $ {} (:init-fn |app.main/main!) (:reload-fn |app.main/reload!) (:version |0.0.1)
-    :modules $ [] |touch-control/ |respo.calcit/ |triadica-space/ |quaternion/
+    :modules $ [] |touch-control/ |respo.calcit/ |triadica-space/ |quaternion/ |memof/
   :entries $ {}
   :files $ {}
     |app.comp.container $ {}
@@ -11,14 +11,27 @@
           defn comp-container (store)
             let
                 states $ :states store
-              ; object $ {} (:draw-mode :line-strip)
-                :vertex-shader $ inline-shader "\"wave.vert"
-                :fragment-shader $ inline-shader "\"wave.frag"
-                :attributes $ {}
-                  :idx $ range 100000
-              ; comp-tube-demo
               ; comp-mesh-demo
-              comp-fibers-demo
+              group ({})
+                comp-tabs
+                  {}
+                    :position $ [] -40 0 0
+                    :selected $ :tab store
+                  , tab-entries
+                case-default (:tab store)
+                  do
+                    js/console.warn "\"Unknown tab:" $ :tab store
+                    comp-axis
+                  :axis $ comp-axis
+                  :wave $ object
+                    {} (:draw-mode :line-strip)
+                      :vertex-shader $ inline-shader "\"wave.vert"
+                      :fragment-shader $ inline-shader "\"wave.frag"
+                      :attributes $ {}
+                        :idx $ range 100000
+                  :tube $ comp-tube-demo
+                  :mesh $ comp-mesh-demo
+                  :fibers $ comp-fibers-demo
         |comp-fibers-demo $ quote
           defn comp-fibers-demo () $ let
               segments 20
@@ -137,6 +150,18 @@
                   * 8 8
         |start-time $ quote
           def start-time $ js/Date.now
+        |tab-entries $ quote
+          def tab-entries $ []
+            {} (:key :axis)
+              :position $ [] -200 140 0
+            {} (:key :wave)
+              :position $ [] -200 100 0
+            {} (:key :tube)
+              :position $ [] -200 60 0
+            {} (:key :mesh)
+              :position $ [] -200 20 0
+            {} (:key :fibers)
+              :position $ [] -200 -20 0
         |triangle-idx! $ quote
           defn triangle-idx! () $ let
               v @*triangle-counter
@@ -149,6 +174,8 @@
           triadica.math :refer $ &v+
           triadica.core :refer $ %nested-attribute >>
           triadica.comp.tube :refer $ comp-tube comp-brush
+          triadica.comp.tabs :refer $ comp-tabs
+          triadica.comp.axis :refer $ comp-axis
     |app.config $ {}
       :defs $ {}
         |inline-shader $ quote
@@ -160,6 +187,7 @@
         |*store $ quote
           defatom *store $ {}
             :states $ {}
+            :tab nil
         |canvas $ quote
           def canvas $ js/document.querySelector "\"canvas"
         |dispatch! $ quote
@@ -169,7 +197,8 @@
                 store @*store
                 next $ case-default op
                   do (js/console.warn "\"unknown op" op) nil
-                  :states $ update-states store ([] op data)
+                  :states $ update-states store data
+                  :tab-focus $ assoc store :tab data
                   :cube-right $ update store :v inc
               if (some? next) (reset! *store next)
         |main! $ quote
@@ -208,3 +237,4 @@
           triadica.core :refer $ on-control-event load-objects! paint-canvas! setup-mouse-events! reset-canvas-size! update-states
           triadica.global :refer $ *gl-context
           app.comp.container :refer $ comp-container *triangle-counter
+          triadica.comp.tabs :refer $ comp-tabs
