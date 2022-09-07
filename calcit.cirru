@@ -295,6 +295,7 @@
                           |T $ {} (:at 1662360870446) (:by |u0) (:type :expr)
                             :data $ {}
                               |T $ {} (:at 1662360870446) (:by |u0) (:text |comp-tabs) (:type :leaf)
+                              |X $ {} (:at 1662538810981) (:by |u0) (:text |tab-entries) (:type :leaf)
                               |b $ {} (:at 1662360870446) (:by |u0) (:type :expr)
                                 :data $ {}
                                   |T $ {} (:at 1662360870446) (:by |u0) (:text |{}) (:type :leaf)
@@ -314,7 +315,18 @@
                                         :data $ {}
                                           |T $ {} (:at 1662360870446) (:by |u0) (:text |:tab) (:type :leaf)
                                           |b $ {} (:at 1662360870446) (:by |u0) (:text |store) (:type :leaf)
-                              |h $ {} (:at 1662360870446) (:by |u0) (:text |tab-entries) (:type :leaf)
+                              |h $ {} (:at 1662538811606) (:by |u0) (:type :expr)
+                                :data $ {}
+                                  |T $ {} (:at 1662538812022) (:by |u0) (:text |fn) (:type :leaf)
+                                  |b $ {} (:at 1662538812368) (:by |u0) (:type :expr)
+                                    :data $ {}
+                                      |T $ {} (:at 1662538815690) (:by |u0) (:text |key) (:type :leaf)
+                                      |b $ {} (:at 1662538816181) (:by |u0) (:text |d!) (:type :leaf)
+                                  |h $ {} (:at 1662538816702) (:by |u0) (:type :expr)
+                                    :data $ {}
+                                      |T $ {} (:at 1662538817201) (:by |u0) (:text |d!) (:type :leaf)
+                                      |X $ {} (:at 1662538822081) (:by |u0) (:text |:tab) (:type :leaf)
+                                      |b $ {} (:at 1662538820267) (:by |u0) (:text |key) (:type :leaf)
                       |T $ {} (:at 1662360820909) (:by |u0) (:type :expr)
                         :data $ {}
                           |D $ {} (:at 1662360825282) (:by |u0) (:text |case-default) (:type :leaf)
@@ -2222,22 +2234,13 @@
                                       |h $ {} (:at 1658488488379) (:by |u0) (:text |data) (:type :leaf)
                               |k $ {} (:at 1662360670061) (:by |u0) (:type :expr)
                                 :data $ {}
-                                  |T $ {} (:at 1662360982076) (:by |u0) (:text |:tab-focus) (:type :leaf)
+                                  |T $ {} (:at 1662538827315) (:by |u0) (:text |:tab) (:type :leaf)
                                   |b $ {} (:at 1662360671834) (:by |u0) (:type :expr)
                                     :data $ {}
                                       |T $ {} (:at 1662360672530) (:by |u0) (:text |assoc) (:type :leaf)
                                       |b $ {} (:at 1662360673193) (:by |u0) (:text |store) (:type :leaf)
                                       |h $ {} (:at 1662360673895) (:by |u0) (:text |:tab) (:type :leaf)
                                       |l $ {} (:at 1662360675563) (:by |u0) (:text |data) (:type :leaf)
-                              |l $ {} (:at 1654079057815) (:by |u0) (:type :expr)
-                                :data $ {}
-                                  |T $ {} (:at 1654079070978) (:by |u0) (:text |:cube-right) (:type :leaf)
-                                  |b $ {} (:at 1654079074551) (:by |u0) (:type :expr)
-                                    :data $ {}
-                                      |T $ {} (:at 1654079075870) (:by |u0) (:text |update) (:type :leaf)
-                                      |b $ {} (:at 1654079093321) (:by |u0) (:text |store) (:type :leaf)
-                                      |h $ {} (:at 1654079093717) (:by |u0) (:text |:v) (:type :leaf)
-                                      |l $ {} (:at 1654079094532) (:by |u0) (:text |inc) (:type :leaf)
                   |b $ {} (:at 1654079109388) (:by |u0) (:type :expr)
                     :data $ {}
                       |T $ {} (:at 1654079109800) (:by |u0) (:text |if) (:type :leaf)

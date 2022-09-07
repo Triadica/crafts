@@ -45,11 +45,11 @@
               ; comp-mesh-demo
               group ({})
                 if (not hide-tabs?)
-                  comp-tabs
+                  comp-tabs tab-entries
                     {}
                       :position $ [] -40 0 0
                       :selected $ :tab store
-                    , tab-entries
+                    fn (key d!) (d! :tab key)
                 case-default (:tab store)
                   do
                     js/console.warn "\"Unknown tab:" $ :tab store
@@ -297,8 +297,7 @@
                 next $ case-default op
                   do (js/console.warn "\"unknown op" op) nil
                   :states $ update-states store data
-                  :tab-focus $ assoc store :tab data
-                  :cube-right $ update store :v inc
+                  :tab $ assoc store :tab data
               if (some? next) (reset! *store next)
         |main! $ quote
           defn main! ()
