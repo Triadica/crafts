@@ -20,11 +20,11 @@
               connections $ build-connections
                 map dots $ fn (d) (v-scale d 100)
             comp-tube $ {} (; :draw-mode :line-strip) (:circle-step 20) (:radius 1)
-              :vertex-shader $ inline-shader "\"lines.vert"
-              :fragment-shader $ inline-shader "\"lines.frag"
+              :vertex-shader $ inline-shader "\"connections.vert"
+              :fragment-shader $ inline-shader "\"connections.frag"
               :brush $ [] 16 0
               :brush2 $ [] 6 4
-              :curve $ w-js-log
+              :curve $ wo-js-log
                 -> connections $ map
                   fn (line)
                     []
@@ -65,6 +65,7 @@
                   :mesh $ comp-mesh-demo
                   :fibers $ comp-fibers-demo
                   :connections $ comp-connections-demo
+                  :rolling-light $ comp-rolling-light
         |comp-fibers-demo $ quote
           defn comp-fibers-demo () $ let
               segments 20
@@ -137,6 +138,61 @@
                       idx $ triangle-idx!
                     assoc di :idx $ floor
                       - (/ idx 3) 3
+        |comp-rolling-light $ quote
+          defn comp-rolling-light () $ let
+              rings $ map
+                [] ([] 1 1 1) ([] 1 -1 2) ([] -1 -2 2) ([] -1 4 2) ([] -3 10 -2) ([] -3 1 -7) ([] -1 8 -7) ([] -5 1 -2) ([] 1 9 7) ([] 4 9 7) ([] -4 9 12) ([] 1 9 2) ([] 19 1 2)
+                , v-normalize
+              normal0 $ [] 0 0 1
+              r1 100
+              r2 101
+              ring-step 80
+              create-ring $ fn (arm color radius thick)
+                let
+                    va $ v-normalize (v-cross arm normal0)
+                    vb $ v-normalize (v-cross va arm)
+                    ds $ / (* 2 &PI) ring-step
+                  -> (range ring-step)
+                    map $ fn (r-idx)
+                      let
+                          angle $ * r-idx ds
+                          angle-next $ + angle ds
+                          p0 $ &v+
+                            &v+
+                              v-scale va $ * radius (cos angle)
+                              v-scale vb $ * radius (sin angle)
+                            v-scale arm thick
+                          p1 $ &v+
+                            &v+
+                              v-scale va $ * radius (cos angle-next)
+                              v-scale vb $ * radius (sin angle-next)
+                            v-scale arm thick
+                          p2 $ &v+
+                            &v+
+                              v-scale va $ * radius (cos angle)
+                              v-scale vb $ * radius (sin angle)
+                            v-scale arm $ negate thick
+                          p3 $ &v+
+                            &v+
+                              v-scale va $ * radius (cos angle-next)
+                              v-scale vb $ * radius (sin angle-next)
+                            v-scale arm $ negate thick
+                        []
+                          {} (:position p0) (:color_v color)
+                          {} (:position p1) (:color_v color)
+                          {} (:position p2) (:color_v color)
+                          {} (:position p1) (:color_v color)
+                          {} (:position p2) (:color_v color)
+                          {} (:position p3) (:color_v color)
+            group ({})
+              object $ {} (:draw-mode :triangles)
+                :vertex-shader $ inline-shader "\"rolling-light.vert"
+                :fragment-shader $ inline-shader "\"rolling-light.frag"
+                :packed-attrs $ []
+                  -> rings $ map
+                    fn (arm) (create-ring arm 1 r1 2)
+                  -> rings $ map
+                    fn (arm) (create-ring arm 0 r2 1.6)
         |comp-tube-demo $ quote
           defn comp-tube-demo () $ let
               r 420
@@ -199,6 +255,8 @@
               :position $ [] -200 -20 0
             {} (:key :connections)
               :position $ [] -200 -60 0
+            {} (:key :rolling-light)
+              :position $ [] -200 -100 0
         |triangle-idx! $ quote
           defn triangle-idx! () $ let
               v @*triangle-counter
@@ -214,7 +272,7 @@
           triadica.comp.tube :refer $ comp-tube comp-brush
           triadica.comp.tabs :refer $ comp-tabs
           triadica.comp.axis :refer $ comp-axis
-          quaternion.core :refer $ &v+ v-scale
+          quaternion.core :refer $ &v+ v-scale v-cross v-normalize
     |app.config $ {}
       :defs $ {}
         |hide-tabs? $ quote
