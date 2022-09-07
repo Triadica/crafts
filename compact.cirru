@@ -66,6 +66,7 @@
                   :fibers $ comp-fibers-demo
                   :connections $ comp-connections-demo
                   :rolling-light $ comp-rolling-light
+                  :plastic $ comp-plastic-demo
         |comp-fibers-demo $ quote
           defn comp-fibers-demo () $ let
               segments 20
@@ -138,6 +139,33 @@
                       idx $ triangle-idx!
                     assoc di :idx $ floor
                       - (/ idx 3) 3
+        |comp-plastic-demo $ quote
+          defn comp-plastic-demo () $ let
+              base 4000
+              bound 200
+              triangles $ -> (range 4000)
+                map $ fn (i)
+                  let
+                      p0 $ rand-point base
+                    []
+                      &v+ p0 $ rand-point bound
+                      &v+ p0 $ rand-point bound
+                      &v+ p0 $ rand-point bound
+                wo-js-log
+            object $ {} (:draw-mode :triangles)
+              :vertex-shader $ inline-shader "\"plastic.vert"
+              :fragment-shader $ inline-shader "\"plastic.frag"
+              :packed-attrs $ -> triangles
+                map $ fn (triangle)
+                  let-sugar
+                        [] p1 p2 p3
+                        , triangle
+                      normal $ v-normalize
+                        v-cross (&v- p2 p1) (&v- p3 p1)
+                    []
+                      {} (:position p1) (:normal normal)
+                      {} (:position p2) (:normal normal)
+                      {} (:position p3) (:normal normal)
         |comp-rolling-light $ quote
           defn comp-rolling-light () $ let
               rings $ map
@@ -239,6 +267,12 @@
                     pow (nth xy 0) 2
                     pow (nth xy 1) 2
                   * 8 8
+        |rand-point $ quote
+          defn rand-point (r)
+            []
+              * r $ js/Math.random
+              * r $ js/Math.random
+              * r $ js/Math.random
         |start-time $ quote
           def start-time $ js/Date.now
         |tab-entries $ quote
@@ -257,6 +291,8 @@
               :position $ [] -200 -60 0
             {} (:key :rolling-light)
               :position $ [] -200 -100 0
+            {} (:key :plastic)
+              :position $ [] -200 -140 0
         |triangle-idx! $ quote
           defn triangle-idx! () $ let
               v @*triangle-counter
@@ -272,7 +308,7 @@
           triadica.comp.tube :refer $ comp-tube comp-brush
           triadica.comp.tabs :refer $ comp-tabs
           triadica.comp.axis :refer $ comp-axis
-          quaternion.core :refer $ &v+ v-scale v-cross v-normalize
+          quaternion.core :refer $ &v+ &v- v-scale v-cross v-normalize
     |app.config $ {}
       :defs $ {}
         |hide-tabs? $ quote
