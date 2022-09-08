@@ -146,7 +146,9 @@
               triangles $ -> (range 4000)
                 map $ fn (i)
                   let
-                      p0 $ rand-point base
+                      p0 $ map (rand-point base)
+                        fn (p)
+                          - p $ * 0.5 base
                     []
                       &v+ p0 $ rand-point bound
                       &v+ p0 $ rand-point bound

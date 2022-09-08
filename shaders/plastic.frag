@@ -9,5 +9,5 @@ varying float v_a;
 varying float v_b;
 
 void main() {
-  gl_FragColor = vec4(hsl2rgb(vec3(0.76 + v_b * 0.2, 1.0, 0.1 + 0.8*v_a)), 1.0);
+  gl_FragColor = vec4(hsl2rgb(vec3(0.66 + v_b * 0.4, 1.0, 0.2 + 0.6*v_a)), 1.0);
 }
