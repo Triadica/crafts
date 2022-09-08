@@ -44,7 +44,7 @@
                 states $ :states store
               ; comp-mesh-demo
               group ({})
-                if (not hide-tabs?)
+                ; if (not hide-tabs?)
                   comp-tabs tab-entries
                     {}
                       :position $ [] -40 0 0
@@ -67,6 +67,7 @@
                   :connections $ comp-connections-demo
                   :rolling-light $ comp-rolling-light
                   :plastic $ comp-plastic-demo
+                  :rings $ comp-rings-demo
         |comp-fibers-demo $ quote
           defn comp-fibers-demo () $ let
               segments 20
@@ -168,6 +169,34 @@
                       {} (:position p1) (:normal normal)
                       {} (:position p2) (:normal normal)
                       {} (:position p3) (:normal normal)
+        |comp-rings-demo $ quote
+          defn comp-rings-demo () $ comp-brush
+            {} (:draw-mode :triangles) (:circle-step 20) (:radius 2)
+              :vertex-shader $ inline-shader "\"rings.vert"
+              :fragment-shader $ inline-shader "\"rings.frag"
+              :brush $ [] 6 6
+              ; :brush2 $ [] 6 4
+              :curve $ let
+                  segments 80
+                -> (range 24)
+                  map $ fn (idx)
+                    let
+                        r $ + 24
+                          * (js/Math.random) 320
+                      ->
+                        range $ inc segments
+                        map $ fn (s-idx)
+                          let
+                              angle $ / (* s-idx 2 &PI) segments
+                            {}
+                              :position $ []
+                                * r $ cos angle
+                                * r $ sin angle
+                                * 80 idx
+                              :idx idx
+              ; :get-uniforms $ fn ()
+                js-object $ :time
+                  &* 0.001 $ - (js/Date.now) start-time
         |comp-rolling-light $ quote
           defn comp-rolling-light () $ let
               rings $ map
@@ -295,6 +324,8 @@
               :position $ [] -200 -100 0
             {} (:key :plastic)
               :position $ [] -200 -140 0
+            {} (:key :rings)
+              :position $ [] -200 -180 0
         |triangle-idx! $ quote
           defn triangle-idx! () $ let
               v @*triangle-counter
