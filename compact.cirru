@@ -67,6 +67,8 @@
                   :connections $ comp-connections-demo
                   :rolling-light $ comp-rolling-light
                   :plastic $ comp-plastic-demo
+                  :rings $ comp-rings-demo
+                  :mooncake $ comp-mooncake-demo
         |comp-fibers-demo $ quote
           defn comp-fibers-demo () $ let
               segments 20
@@ -139,6 +141,34 @@
                       idx $ triangle-idx!
                     assoc di :idx $ floor
                       - (/ idx 3) 3
+        |comp-mooncake-demo $ quote
+          defn comp-mooncake-demo () $ object
+            {} (:draw-mode :triangles)
+              :vertex-shader $ inline-shader "\"mooncake.vert"
+              :fragment-shader $ inline-shader "\"mooncake.frag"
+              :packed-attrs $ let
+                  dots 800
+                  r 200
+                  twine-r $ * r 0.06
+                  down-face $ ->
+                    range $ inc dots
+                    map $ fn (d-idx)
+                      let
+                          angle $ * 2 &PI (/ d-idx dots)
+                          twine-angle $ * 16 angle
+                        &v+
+                          []
+                            * r $ cos angle
+                            , 0 $ * r (sin angle)
+                          []
+                            * twine-r $ cos twine-angle
+                            , 0 $ * twine-r (sin twine-angle)
+                  up-face $ map down-face
+                    fn (p)
+                      &v+ p $ [] 0 80 0
+                [] (wind-pieces up-face down-face)
+                  connect-pieces down-face $ [] 0 0 0
+                  connect-pieces-dense up-face $ [] 0 80 0
         |comp-plastic-demo $ quote
           defn comp-plastic-demo () $ let
               base 4000
@@ -168,6 +198,34 @@
                       {} (:position p1) (:normal normal)
                       {} (:position p2) (:normal normal)
                       {} (:position p3) (:normal normal)
+        |comp-rings-demo $ quote
+          defn comp-rings-demo () $ comp-brush
+            {} (:draw-mode :triangles) (:circle-step 20) (:radius 2)
+              :vertex-shader $ inline-shader "\"rings.vert"
+              :fragment-shader $ inline-shader "\"rings.frag"
+              :brush $ [] 6 6
+              ; :brush2 $ [] 6 4
+              :curve $ let
+                  segments 80
+                -> (range 24)
+                  map $ fn (idx)
+                    let
+                        r $ + 24
+                          * (js/Math.random) 320
+                      ->
+                        range $ inc segments
+                        map $ fn (s-idx)
+                          let
+                              angle $ / (* s-idx 2 &PI) segments
+                            {}
+                              :position $ []
+                                * r $ cos angle
+                                * r $ sin angle
+                                * 80 idx
+                              :idx idx
+              ; :get-uniforms $ fn ()
+                js-object $ :time
+                  &* 0.001 $ - (js/Date.now) start-time
         |comp-rolling-light $ quote
           defn comp-rolling-light () $ let
               rings $ map
@@ -254,6 +312,47 @@
               ; :get-uniforms $ fn ()
                 js-object $ :time
                   &* 0.001 $ - (js/Date.now) start-time
+        |connect-pieces $ quote
+          defn connect-pieces (dots middle)
+            ->
+              range $ dec (count dots)
+              map $ fn (idx)
+                []
+                  {} $ :position (nth dots idx)
+                  {} $ :position
+                    nth dots $ inc idx
+                  {} $ :position middle
+        |connect-pieces-dense $ quote
+          defn connect-pieces-dense (dots center)
+            ->
+              range $ dec (count dots)
+              map $ fn (idx)
+                let
+                    pa $ nth dots idx
+                    pb $ nth dots (inc idx)
+                    step 400
+                  -> (range step)
+                    map $ fn (r-idx)
+                      let
+                          pai $ assoc
+                            v-scale pa $ / r-idx step
+                            , 1 (nth pa 1)
+                          pbi $ assoc
+                            v-scale pb $ / r-idx step
+                            , 1 (nth pb 1)
+                          pai-next $ assoc
+                            v-scale pa $ / (inc r-idx) step
+                            , 1 (nth pa 1)
+                          pbi-next $ assoc
+                            v-scale pb $ / (inc r-idx) step
+                            , 1 (nth pb 1)
+                        []
+                          {} $ :position pai
+                          {} $ :position pbi
+                          {} $ :position pai-next
+                          {} $ :position pbi
+                          {} $ :position pai-next
+                          {} $ :position pbi-next
         |dots $ quote
           def dots $ [] ([] 1 1 1) ([] 1 1 -1) ([] 1 -1 1) ([] 1 -1 -1) ([] -1 1 1) ([] -1 1 -1) ([] -1 -1 1) ([] -1 -1 -1) ([] 0 0 1.414) ([] 0 0 -1.414) ([] 0 1.414 0) ([] 0 -1.414 0) ([] 1.414 0 0) ([] -1.414 0 0)
         |fibers-grid $ quote
@@ -280,26 +379,46 @@
         |tab-entries $ quote
           def tab-entries $ []
             {} (:key :axis)
-              :position $ [] -200 140 0
+              :position $ [] -200 180 0
             {} (:key :wave)
-              :position $ [] -200 100 0
+              :position $ [] -200 140 0
             {} (:key :tube)
-              :position $ [] -200 60 0
+              :position $ [] -200 100 0
             {} (:key :mesh)
-              :position $ [] -200 20 0
+              :position $ [] -200 60 0
             {} (:key :fibers)
-              :position $ [] -200 -20 0
+              :position $ [] -200 20 0
             {} (:key :connections)
-              :position $ [] -200 -60 0
+              :position $ [] -200 -20 0
             {} (:key :rolling-light)
-              :position $ [] -200 -100 0
+              :position $ [] -200 -60 0
             {} (:key :plastic)
-              :position $ [] -200 -140 0
+              :position $ [] -200 -100 0
+            {} (:key :rings)
+              :position $ [] -280 120 0
+            {} (:key :mooncake)
+              :position $ [] -280 80 0
         |triangle-idx! $ quote
           defn triangle-idx! () $ let
               v @*triangle-counter
             swap! *triangle-counter inc
             , v
+        |wind-pieces $ quote
+          defn wind-pieces (a b)
+            let
+                c $ dec (count a)
+              -> (range c)
+                map $ fn (idx)
+                  []
+                    {} $ :position (nth a idx)
+                    {} $ :position (nth b idx)
+                    {} $ :position
+                      nth a $ inc idx
+                    {} $ :position (nth b idx)
+                    {} $ :position
+                      nth a $ inc idx
+                    {} $ :position
+                      nth b $ inc idx
       :ns $ quote
         ns app.comp.container $ :require ("\"twgl.js" :as twgl)
           app.config :refer $ inline-shader hide-tabs?
@@ -324,7 +443,7 @@
         |*store $ quote
           defatom *store $ {}
             :states $ {}
-            :tab $ turn-keyword (get-env "\"tab" "\"axis")
+            :tab $ turn-keyword (get-env "\"tab" "\"mooncake")
         |canvas $ quote
           def canvas $ js/document.querySelector "\"canvas"
         |dispatch! $ quote
