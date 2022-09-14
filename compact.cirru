@@ -334,18 +334,15 @@
                   -> (range step)
                     map $ fn (r-idx)
                       let
-                          pai $ assoc
-                            v-scale pa $ / r-idx step
-                            , 1 (nth pa 1)
-                          pbi $ assoc
-                            v-scale pb $ / r-idx step
-                            , 1 (nth pb 1)
-                          pai-next $ assoc
-                            v-scale pa $ / (inc r-idx) step
-                            , 1 (nth pa 1)
-                          pbi-next $ assoc
-                            v-scale pb $ / (inc r-idx) step
-                            , 1 (nth pb 1)
+                          step-inverted $ &/ 1 step
+                          pai $ v-scale-xz pa (&* r-idx step-inverted) (&list:nth pa 1)
+                          pbi $ v-scale-xz pb (&* r-idx step-inverted) (&list:nth pb 1)
+                          pai-next $ v-scale-xz pa
+                            &* (inc r-idx) step-inverted
+                            &list:nth pa 1
+                          pbi-next $ v-scale-xz pb
+                            &* (inc r-idx) step-inverted
+                            &list:nth pb 1
                         []
                           {} $ :position pai
                           {} $ :position pbi
@@ -403,6 +400,11 @@
               v @*triangle-counter
             swap! *triangle-counter inc
             , v
+        |v-scale-xz $ quote
+          defn v-scale-xz (xyz r y)
+            []
+              &* (&list:nth xyz 0) r
+              , y $ &* (&list:nth xyz 2) r
         |wind-pieces $ quote
           defn wind-pieces (a b)
             let
