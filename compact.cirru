@@ -15,22 +15,22 @@
                   fn (d2) ([] d1 d2)
               filter $ fn (ab)
                 not= (nth ab 0) (nth ab 1)
-        |comp-calcit-demo $ quote
-          defn comp-calcit-demo () $ let
+        |comp-calcite-demo $ quote
+          defn comp-calcite-demo () $ let
               size 12
               step 200
               inserted 24
               ss $ sin
                 * &PI $ / 78 180
-              cs $ cos
-                * &PI $ / 78 180
+              cs $ w-log
+                cos $ * &PI (/ 78 180)
               step-ss $ * step ss
               from -2000
               to 2000
               delta $ do
                 * (- to from)
-                  cos $ * &PI (/ 78 180)
-              base $ range-bothway size
+                  cos $ * &PI (/ 78.5 180)
+              base $ range size
             group ({}) (comp-axis)
               comp-tube $ {} (; :draw-mode :line-strip) (:circle-step 5) (:radius 2.4)
                 :vertex-shader $ inline-shader "\"calcit.vert"
@@ -51,16 +51,32 @@
                       -> base $ map
                         fn (y-idx)
                           interpolate-line-positions
-                            [] (* step x-idx) (* step y-idx) from
-                            [] (* step x-idx) (* step y-idx) to
+                            []
+                              +
+                                + (* step x-idx) 0
+                                * (/ size 10)
+                                  * y-idx $ / delta size
+                              * step y-idx
+                              , from
+                            []
+                              +
+                                - (* step x-idx) 0
+                                noted "\"magic value..." $ * (/ size 10)
+                                  * y-idx $ / delta size
+                              * step y-idx
+                              , to
                             , inserted
                   -> base $ mapcat
                     fn (x-idx)
                       -> base $ map
                         fn (z-idx)
                           interpolate-line-positions
-                            [] (* step x-idx) from $ * step z-idx
-                            [] (* step x-idx) to $ * step z-idx
+                            []
+                              - (* step x-idx) delta
+                              , from $ * step z-idx
+                            []
+                              + (* step x-idx) delta
+                              , to $ * step z-idx
                             , inserted
                 :normal0 $ [] 1 2 0
                 ; :get-uniforms $ fn ()
@@ -93,9 +109,8 @@
           defn comp-container (store)
             let
                 states $ :states store
-              ; comp-mesh-demo
               group ({})
-                ; if (not hide-tabs?)
+                if (not hide-tabs?)
                   comp-tabs tab-entries
                     {}
                       :position $ [] -40 0 0
@@ -120,7 +135,7 @@
                   :plastic $ comp-plastic-demo
                   :rings $ comp-rings-demo
                   :mooncake $ comp-mooncake-demo
-                  :calcit $ comp-calcit-demo
+                  :calcite $ comp-calcite-demo
         |comp-fibers-demo $ quote
           defn comp-fibers-demo () $ let
               segments 20
@@ -459,7 +474,7 @@
               :position $ [] -280 120 0
             {} (:key :mooncake)
               :position $ [] -280 80 0
-            {} (:key :calcit)
+            {} (:key :calcite)
               :position $ [] -280 40 0
         |triangle-idx! $ quote
           defn triangle-idx! () $ let
@@ -511,7 +526,7 @@
         |*store $ quote
           defatom *store $ {}
             :states $ {}
-            :tab $ turn-keyword (get-env "\"tab" "\"calcit")
+            :tab $ turn-keyword (get-env "\"tab" "\"calcite")
         |canvas $ quote
           def canvas $ js/document.querySelector "\"canvas"
         |dispatch! $ quote
