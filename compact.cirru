@@ -15,6 +15,57 @@
                   fn (d2) ([] d1 d2)
               filter $ fn (ab)
                 not= (nth ab 0) (nth ab 1)
+        |comp-calcit-demo $ quote
+          defn comp-calcit-demo () $ let
+              size 12
+              step 200
+              inserted 24
+              ss $ sin
+                * &PI $ / 78 180
+              cs $ cos
+                * &PI $ / 78 180
+              step-ss $ * step ss
+              from -2000
+              to 2000
+              delta $ do
+                * (- to from)
+                  cos $ * &PI (/ 78 180)
+              base $ range-bothway size
+            group ({}) (comp-axis)
+              comp-tube $ {} (; :draw-mode :line-strip) (:circle-step 5) (:radius 2.4)
+                :vertex-shader $ inline-shader "\"calcit.vert"
+                :fragment-shader $ inline-shader "\"calcit.frag"
+                :brush $ [] 16 0
+                :brush2 $ [] 6 4
+                :curve $ concat
+                  -> base $ mapcat
+                    fn (z-idx)
+                      -> base $ map
+                        fn (y-idx)
+                          interpolate-line-positions
+                            [] from (* step y-idx) (* step z-idx)
+                            [] to (* step y-idx) (* step z-idx)
+                            , inserted
+                  -> base $ mapcat
+                    fn (x-idx)
+                      -> base $ map
+                        fn (y-idx)
+                          interpolate-line-positions
+                            [] (* step x-idx) (* step y-idx) from
+                            [] (* step x-idx) (* step y-idx) to
+                            , inserted
+                  -> base $ mapcat
+                    fn (x-idx)
+                      -> base $ map
+                        fn (z-idx)
+                          interpolate-line-positions
+                            [] (* step x-idx) from $ * step z-idx
+                            [] (* step x-idx) to $ * step z-idx
+                            , inserted
+                :normal0 $ [] 1 2 0
+                ; :get-uniforms $ fn ()
+                  js-object $ :time
+                    &* 0.001 $ - (js/Date.now) start-time
         |comp-connections-demo $ quote
           defn comp-connections-demo () $ let
               connections $ build-connections
@@ -44,7 +95,7 @@
                 states $ :states store
               ; comp-mesh-demo
               group ({})
-                if (not hide-tabs?)
+                ; if (not hide-tabs?)
                   comp-tabs tab-entries
                     {}
                       :position $ [] -40 0 0
@@ -69,6 +120,7 @@
                   :plastic $ comp-plastic-demo
                   :rings $ comp-rings-demo
                   :mooncake $ comp-mooncake-demo
+                  :calcit $ comp-calcit-demo
         |comp-fibers-demo $ quote
           defn comp-fibers-demo () $ let
               segments 20
@@ -365,6 +417,18 @@
                     pow (nth xy 0) 2
                     pow (nth xy 1) 2
                   * 8 8
+        |interpolate-line-positions $ quote
+          defn interpolate-line-positions (a b n)
+            let
+                ratio $ / 1 n
+              ->
+                range $ inc n
+                map $ fn (idx)
+                  {}
+                    :position $ &v+
+                      v-scale a $ * ratio idx
+                      v-scale b $ * ratio (- n idx)
+                    ; :idx $ - idx (* 0.5 n)
         |rand-point $ quote
           defn rand-point (r)
             []
@@ -395,6 +459,8 @@
               :position $ [] -280 120 0
             {} (:key :mooncake)
               :position $ [] -280 80 0
+            {} (:key :calcit)
+              :position $ [] -280 40 0
         |triangle-idx! $ quote
           defn triangle-idx! () $ let
               v @*triangle-counter
@@ -445,7 +511,7 @@
         |*store $ quote
           defatom *store $ {}
             :states $ {}
-            :tab $ turn-keyword (get-env "\"tab" "\"mooncake")
+            :tab $ turn-keyword (get-env "\"tab" "\"calcit")
         |canvas $ quote
           def canvas $ js/document.querySelector "\"canvas"
         |dispatch! $ quote
