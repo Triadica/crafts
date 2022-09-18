@@ -84,8 +84,8 @@
                     &* 0.001 $ - (js/Date.now) start-time
         |comp-city-demo $ quote
           defn comp-city-demo () $ let
-              base-list $ range 20
-              block 400
+              base-list $ range 14
+              block 600
               x-width 200
               z-width 300
               y-width 20
@@ -98,58 +98,98 @@
                     fn (z-idx)
                       let
                           n $ js/Math.floor
-                            * 20 $ js/Math.random
-                          height $ * (js/Math.pow n 1.5) y-width
-                          p0 $ [] (* block x-idx) 0 (* block z-idx)
-                          p1 $ []
-                            + x-width $ * block x-idx
-                            , 0 (* block z-idx)
-                          p2 $ [] (* block x-idx) 0
-                            + z-width $ * block z-idx
-                          p3 $ []
-                            + x-width $ * block x-idx
-                            , 0
-                              + z-width $ * block z-idx
-                          p4 $ assoc p0 1 height
-                          p5 $ assoc p1 1 height
-                          p6 $ assoc p2 1 height
-                          p7 $ assoc p3 1 height
-                        []
-                          []
-                            {} $ :position p0
-                            {} $ :position p1
-                            {} $ :position p4
-                            {} $ :position p1
-                            {} $ :position p4
-                            {} $ :position p5
-                          []
-                            {} $ :position p1
-                            {} $ :position p3
-                            {} $ :position p5
-                            {} $ :position p3
-                            {} $ :position p5
-                            {} $ :position p7
-                          []
-                            {} $ :position p3
-                            {} $ :position p2
-                            {} $ :position p7
-                            {} $ :position p2
-                            {} $ :position p7
-                            {} $ :position p6
-                          []
-                            {} $ :position p2
-                            {} $ :position p0
-                            {} $ :position p6
-                            {} $ :position p0
-                            {} $ :position p6
-                            {} $ :position p4
-                          []
-                            {} $ :position p4
-                            {} $ :position p5
-                            {} $ :position p7
-                            {} $ :position p4
-                            {} $ :position p7
-                            {} $ :position p6
+                            js/Math.pow
+                              * 20 $ js/Math.random
+                              , 1.5
+                          height $ * n y-width
+                        -> (range n)
+                          map $ fn (level)
+                            let
+                                h $ * level y-width
+                                p0 $ [] (* block x-idx) h (* block z-idx)
+                                p1 $ []
+                                  + x-width $ * block x-idx
+                                  , h (* block z-idx)
+                                p2 $ [] (* block x-idx) h
+                                  + z-width $ * block z-idx
+                                p3 $ []
+                                  + x-width $ * block x-idx
+                                  , h
+                                    + z-width $ * block z-idx
+                                p4 $ update p0 1
+                                  fn (a) (+ a y-width)
+                                p5 $ update p1 1
+                                  fn (a) (+ a y-width)
+                                p6 $ update p2 1
+                                  fn (a) (+ a y-width)
+                                p7 $ update p3 1
+                                  fn (a) (+ a y-width)
+                              []
+                                []
+                                  {} (:position p0)
+                                    :left $ nth p0 0
+                                  {} (:position p1)
+                                    :left $ nth p1 0
+                                  {} (:position p4)
+                                    :left $ nth p4 0
+                                  {} (:position p1)
+                                    :left $ nth p1 0
+                                  {} (:position p4)
+                                    :left $ nth p4 0
+                                  {} (:position p5)
+                                    :left $ nth p5 0
+                                []
+                                  {} (:position p1)
+                                    :left $ nth p1 2
+                                  {} (:position p3)
+                                    :left $ nth p3 2
+                                  {} (:position p5)
+                                    :left $ nth p5 2
+                                  {} (:position p3)
+                                    :left $ nth p3 2
+                                  {} (:position p5)
+                                    :left $ nth p5 2
+                                  {} (:position p7)
+                                    :left $ nth p7 2
+                                []
+                                  {} (:position p3)
+                                    :left $ nth p3 0
+                                  {} (:position p2)
+                                    :left $ nth p2 0
+                                  {} (:position p7)
+                                    :left $ nth p7 0
+                                  {} (:position p2)
+                                    :left $ nth p2 0
+                                  {} (:position p7)
+                                    :left $ nth p7 0
+                                  {} (:position p6)
+                                    :left $ nth p6 0
+                                []
+                                  {} (:position p2)
+                                    :left $ nth p2 2
+                                  {} (:position p0)
+                                    :left $ nth p0 2
+                                  {} (:position p6)
+                                    :left $ nth p6 2
+                                  {} (:position p0)
+                                    :left $ nth p0 2
+                                  {} (:position p6)
+                                    :left $ nth p6 2
+                                  {} (:position p4)
+                                    :left $ nth p4 2
+                                []
+                                  {} (:position p4)
+                                    :left $ nth p4 1
+                                  {} (:position p5)
+                                    :left $ nth p5 1
+                                  {} (:position p7)
+                                    :left $ nth p7 1
+                                  {} (:position p4)
+                                    :left $ nth p4 1
+                                  {} (:position p7)
+                                    :left $ nth p7 1
+                                  {} (:position p6)
+                                    :left $ nth p6 1
         |comp-connections-demo $ quote
           defn comp-connections-demo () $ let
               connections $ build-connections
