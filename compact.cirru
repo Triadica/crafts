@@ -22,8 +22,8 @@
               inserted 24
               ss $ sin
                 * &PI $ / 78 180
-              cs $ w-log
-                cos $ * &PI (/ 78 180)
+              cs $ cos
+                * &PI $ / 78 180
               step-ss $ * step ss
               from -2000
               to 2000
@@ -82,6 +82,74 @@
                 ; :get-uniforms $ fn ()
                   js-object $ :time
                     &* 0.001 $ - (js/Date.now) start-time
+        |comp-city-demo $ quote
+          defn comp-city-demo () $ let
+              base-list $ range 20
+              block 400
+              x-width 200
+              z-width 300
+              y-width 20
+            object $ {} (:draw-mode :triangles)
+              :vertex-shader $ inline-shader "\"city.vert"
+              :fragment-shader $ inline-shader "\"city.frag"
+              :packed-attrs $ -> base-list
+                map $ fn (x-idx)
+                  -> base-list $ map
+                    fn (z-idx)
+                      let
+                          n $ js/Math.floor
+                            * 20 $ js/Math.random
+                          height $ * (js/Math.pow n 1.5) y-width
+                          p0 $ [] (* block x-idx) 0 (* block z-idx)
+                          p1 $ []
+                            + x-width $ * block x-idx
+                            , 0 (* block z-idx)
+                          p2 $ [] (* block x-idx) 0
+                            + z-width $ * block z-idx
+                          p3 $ []
+                            + x-width $ * block x-idx
+                            , 0
+                              + z-width $ * block z-idx
+                          p4 $ assoc p0 1 height
+                          p5 $ assoc p1 1 height
+                          p6 $ assoc p2 1 height
+                          p7 $ assoc p3 1 height
+                        []
+                          []
+                            {} $ :position p0
+                            {} $ :position p1
+                            {} $ :position p4
+                            {} $ :position p1
+                            {} $ :position p4
+                            {} $ :position p5
+                          []
+                            {} $ :position p1
+                            {} $ :position p3
+                            {} $ :position p5
+                            {} $ :position p3
+                            {} $ :position p5
+                            {} $ :position p7
+                          []
+                            {} $ :position p3
+                            {} $ :position p2
+                            {} $ :position p7
+                            {} $ :position p2
+                            {} $ :position p7
+                            {} $ :position p6
+                          []
+                            {} $ :position p2
+                            {} $ :position p0
+                            {} $ :position p6
+                            {} $ :position p0
+                            {} $ :position p6
+                            {} $ :position p4
+                          []
+                            {} $ :position p4
+                            {} $ :position p5
+                            {} $ :position p7
+                            {} $ :position p4
+                            {} $ :position p7
+                            {} $ :position p6
         |comp-connections-demo $ quote
           defn comp-connections-demo () $ let
               connections $ build-connections
@@ -136,6 +204,7 @@
                   :rings $ comp-rings-demo
                   :mooncake $ comp-mooncake-demo
                   :calcite $ comp-calcite-demo
+                  :city $ comp-city-demo
         |comp-fibers-demo $ quote
           defn comp-fibers-demo () $ let
               segments 20
@@ -476,6 +545,8 @@
               :position $ [] -280 80 0
             {} (:key :calcite)
               :position $ [] -280 40 0
+            {} (:key :city)
+              :position $ [] -280 0 0
         |triangle-idx! $ quote
           defn triangle-idx! () $ let
               v @*triangle-counter
