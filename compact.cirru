@@ -15,6 +15,181 @@
                   fn (d2) ([] d1 d2)
               filter $ fn (ab)
                 not= (nth ab 0) (nth ab 1)
+        |comp-calcite-demo $ quote
+          defn comp-calcite-demo () $ let
+              size 12
+              step 200
+              inserted 24
+              ss $ sin
+                * &PI $ / 78 180
+              cs $ cos
+                * &PI $ / 78 180
+              step-ss $ * step ss
+              from -2000
+              to 2000
+              delta $ do
+                * (- to from)
+                  cos $ * &PI (/ 78.5 180)
+              base $ range size
+            group ({}) (comp-axis)
+              comp-tube $ {} (; :draw-mode :line-strip) (:circle-step 5) (:radius 2.4)
+                :vertex-shader $ inline-shader "\"calcit.vert"
+                :fragment-shader $ inline-shader "\"calcit.frag"
+                :brush $ [] 16 0
+                :brush2 $ [] 6 4
+                :curve $ concat
+                  -> base $ mapcat
+                    fn (z-idx)
+                      -> base $ map
+                        fn (y-idx)
+                          interpolate-line-positions
+                            [] from (* step y-idx) (* step z-idx)
+                            [] to (* step y-idx) (* step z-idx)
+                            , inserted
+                  -> base $ mapcat
+                    fn (x-idx)
+                      -> base $ map
+                        fn (y-idx)
+                          interpolate-line-positions
+                            []
+                              +
+                                + (* step x-idx) 0
+                                * (/ size 10)
+                                  * y-idx $ / delta size
+                              * step y-idx
+                              , from
+                            []
+                              +
+                                - (* step x-idx) 0
+                                noted "\"magic value..." $ * (/ size 10)
+                                  * y-idx $ / delta size
+                              * step y-idx
+                              , to
+                            , inserted
+                  -> base $ mapcat
+                    fn (x-idx)
+                      -> base $ map
+                        fn (z-idx)
+                          interpolate-line-positions
+                            []
+                              - (* step x-idx) delta
+                              , from $ * step z-idx
+                            []
+                              + (* step x-idx) delta
+                              , to $ * step z-idx
+                            , inserted
+                :normal0 $ [] 1 2 0
+                ; :get-uniforms $ fn ()
+                  js-object $ :time
+                    &* 0.001 $ - (js/Date.now) start-time
+        |comp-city-demo $ quote
+          defn comp-city-demo () $ let
+              base-list $ range 14
+              block 600
+              x-width 200
+              z-width 300
+              y-width 20
+            object $ {} (:draw-mode :triangles)
+              :vertex-shader $ inline-shader "\"city.vert"
+              :fragment-shader $ inline-shader "\"city.frag"
+              :packed-attrs $ -> base-list
+                map $ fn (x-idx)
+                  -> base-list $ map
+                    fn (z-idx)
+                      let
+                          n $ js/Math.floor
+                            js/Math.pow
+                              * 20 $ js/Math.random
+                              , 1.5
+                          height $ * n y-width
+                        -> (range n)
+                          map $ fn (level)
+                            let
+                                h $ * level y-width
+                                p0 $ [] (* block x-idx) h (* block z-idx)
+                                p1 $ []
+                                  + x-width $ * block x-idx
+                                  , h (* block z-idx)
+                                p2 $ [] (* block x-idx) h
+                                  + z-width $ * block z-idx
+                                p3 $ []
+                                  + x-width $ * block x-idx
+                                  , h
+                                    + z-width $ * block z-idx
+                                p4 $ update p0 1
+                                  fn (a) (+ a y-width)
+                                p5 $ update p1 1
+                                  fn (a) (+ a y-width)
+                                p6 $ update p2 1
+                                  fn (a) (+ a y-width)
+                                p7 $ update p3 1
+                                  fn (a) (+ a y-width)
+                              []
+                                []
+                                  {} (:position p0)
+                                    :left $ nth p0 0
+                                  {} (:position p1)
+                                    :left $ nth p1 0
+                                  {} (:position p4)
+                                    :left $ nth p4 0
+                                  {} (:position p1)
+                                    :left $ nth p1 0
+                                  {} (:position p4)
+                                    :left $ nth p4 0
+                                  {} (:position p5)
+                                    :left $ nth p5 0
+                                []
+                                  {} (:position p1)
+                                    :left $ nth p1 2
+                                  {} (:position p3)
+                                    :left $ nth p3 2
+                                  {} (:position p5)
+                                    :left $ nth p5 2
+                                  {} (:position p3)
+                                    :left $ nth p3 2
+                                  {} (:position p5)
+                                    :left $ nth p5 2
+                                  {} (:position p7)
+                                    :left $ nth p7 2
+                                []
+                                  {} (:position p3)
+                                    :left $ nth p3 0
+                                  {} (:position p2)
+                                    :left $ nth p2 0
+                                  {} (:position p7)
+                                    :left $ nth p7 0
+                                  {} (:position p2)
+                                    :left $ nth p2 0
+                                  {} (:position p7)
+                                    :left $ nth p7 0
+                                  {} (:position p6)
+                                    :left $ nth p6 0
+                                []
+                                  {} (:position p2)
+                                    :left $ nth p2 2
+                                  {} (:position p0)
+                                    :left $ nth p0 2
+                                  {} (:position p6)
+                                    :left $ nth p6 2
+                                  {} (:position p0)
+                                    :left $ nth p0 2
+                                  {} (:position p6)
+                                    :left $ nth p6 2
+                                  {} (:position p4)
+                                    :left $ nth p4 2
+                                []
+                                  {} (:position p4)
+                                    :left $ nth p4 1
+                                  {} (:position p5)
+                                    :left $ nth p5 1
+                                  {} (:position p7)
+                                    :left $ nth p7 1
+                                  {} (:position p4)
+                                    :left $ nth p4 1
+                                  {} (:position p7)
+                                    :left $ nth p7 1
+                                  {} (:position p6)
+                                    :left $ nth p6 1
         |comp-connections-demo $ quote
           defn comp-connections-demo () $ let
               connections $ build-connections
@@ -42,7 +217,6 @@
           defn comp-container (store)
             let
                 states $ :states store
-              ; comp-mesh-demo
               group ({})
                 if (not hide-tabs?)
                   comp-tabs tab-entries
@@ -69,6 +243,8 @@
                   :plastic $ comp-plastic-demo
                   :rings $ comp-rings-demo
                   :mooncake $ comp-mooncake-demo
+                  :calcite $ comp-calcite-demo
+                  :city $ comp-city-demo
         |comp-fibers-demo $ quote
           defn comp-fibers-demo () $ let
               segments 20
@@ -365,6 +541,18 @@
                     pow (nth xy 0) 2
                     pow (nth xy 1) 2
                   * 8 8
+        |interpolate-line-positions $ quote
+          defn interpolate-line-positions (a b n)
+            let
+                ratio $ / 1 n
+              ->
+                range $ inc n
+                map $ fn (idx)
+                  {}
+                    :position $ &v+
+                      v-scale a $ * ratio idx
+                      v-scale b $ * ratio (- n idx)
+                    ; :idx $ - idx (* 0.5 n)
         |rand-point $ quote
           defn rand-point (r)
             []
@@ -395,6 +583,10 @@
               :position $ [] -280 120 0
             {} (:key :mooncake)
               :position $ [] -280 80 0
+            {} (:key :calcite)
+              :position $ [] -280 40 0
+            {} (:key :city)
+              :position $ [] -280 0 0
         |triangle-idx! $ quote
           defn triangle-idx! () $ let
               v @*triangle-counter
@@ -445,7 +637,7 @@
         |*store $ quote
           defatom *store $ {}
             :states $ {}
-            :tab $ turn-keyword (get-env "\"tab" "\"mooncake")
+            :tab $ turn-keyword (get-env "\"tab" "\"calcite")
         |canvas $ quote
           def canvas $ js/document.querySelector "\"canvas"
         |dispatch! $ quote
