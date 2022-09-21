@@ -245,6 +245,53 @@
                   :mooncake $ comp-mooncake-demo
                   :calcite $ comp-calcite-demo
                   :city $ comp-city-demo
+                  :dianthus $ comp-dianthus-demo
+        |comp-dianthus-demo $ quote
+          defn comp-dianthus-demo () $ object
+            {} (:draw-mode :triangles)
+              :vertex-shader $ inline-shader "\"dianthus.vert"
+              :fragment-shader $ inline-shader "\"dianthus.frag"
+              :packed-attrs $ let
+                  dr 0.1
+                  da 0.06
+                  s-step 80
+                -> (range 600)
+                  map $ fn (idx)
+                    -> (range s-step)
+                      map $ fn (s-idx)
+                        let
+                            radius $ * dr idx
+                            radius-next $ + radius dr
+                            angle $ * da idx
+                            angle-next $ + angle da
+                            s-r $ &/ s-idx s-step
+                            a $ + 1
+                              * 0.02 $ noise-2d radius (* 8 angle)
+                            a-next $ + 1
+                              * 0.02 $ noise-2d radius-next (* 8 angle-next)
+                            v0 $ []
+                              * radius $ cos angle
+                              , 100
+                                * radius $ sin angle
+                            v1 $ []
+                              * radius-next $ cos angle-next
+                              , 100
+                                * radius-next $ sin angle-next
+                            p0 $ v-scale v0
+                              * a $ / s-idx s-step
+                            p1 $ v-scale v1
+                              * a-next $ / s-idx s-step
+                            p2 $ v-scale v0
+                              * a $ / (inc s-idx) s-step
+                            p3 $ v-scale v1
+                              * a-next $ / (inc s-idx) s-step
+                          []
+                            {} (:position p0) (:a a)
+                            {} (:position p1) (:a a-next)
+                            {} (:position p2) (:a a)
+                            {} (:position p1) (:a a-next)
+                            {} (:position p2) (:a a)
+                            {} (:position p3) (:a a-next)
         |comp-fibers-demo $ quote
           defn comp-fibers-demo () $ let
               segments 20
@@ -553,6 +600,8 @@
                       v-scale a $ * ratio idx
                       v-scale b $ * ratio (- n idx)
                     ; :idx $ - idx (* 0.5 n)
+        |noise-2d $ quote
+          def noise-2d $ createNoise2D
         |rand-point $ quote
           defn rand-point (r)
             []
@@ -587,6 +636,8 @@
               :position $ [] -280 40 0
             {} (:key :city)
               :position $ [] -280 0 0
+            {} (:key :dianthus)
+              :position $ [] -280 -40 0
         |triangle-idx! $ quote
           defn triangle-idx! () $ let
               v @*triangle-counter
@@ -624,6 +675,7 @@
           triadica.comp.tabs :refer $ comp-tabs
           triadica.comp.axis :refer $ comp-axis
           quaternion.core :refer $ &v+ &v- v-scale v-cross v-normalize
+          "\"simplex-noise" :refer $ createNoise2D
     |app.config $ {}
       :defs $ {}
         |hide-tabs? $ quote
@@ -637,7 +689,7 @@
         |*store $ quote
           defatom *store $ {}
             :states $ {}
-            :tab $ turn-keyword (get-env "\"tab" "\"calcite")
+            :tab $ turn-keyword (get-env "\"tab" "\"dianthus")
         |canvas $ quote
           def canvas $ js/document.querySelector "\"canvas"
         |dispatch! $ quote
