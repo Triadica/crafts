@@ -82,6 +82,41 @@
                 ; :get-uniforms $ fn ()
                   js-object $ :time
                     &* 0.001 $ - (js/Date.now) start-time
+        |comp-christmas-tree-demo $ quote
+          defn comp-christmas-tree-demo () $ comp-strip-light
+            {}
+              :lines $ ->
+                [] ([] 0 0 0) ([] 600 0 100) ([] 200 0 500) ([] -100 0 -400) ([] 400 0 700)
+                mapcat $ fn (base)
+                  let
+                      level $ + 7
+                        .floor $ * 5 (js/Math.random)
+                      size0 6
+                      r0 50
+                      top 400
+                      down 50
+                      thickness 120
+                    -> (range level)
+                      mapcat $ fn (l-idx)
+                        let
+                            size $ + size0 (* 3 l-idx)
+                          -> (range size)
+                            map $ fn (idx)
+                              let
+                                  angle $ * 2 &PI (/ idx size)
+                                  up $ - top (* l-idx down)
+                                  r $ + r0 (* l-idx 20)
+                                []
+                                  &v+ base $ [] 0 up 0
+                                  &v+ base $ []
+                                    * r $ cos angle
+                                    - up thickness
+                                    * r $ sin angle
+                      conj $ []
+                        v+ base $ [] 0 -200 0
+                        v+ base $ [] 0 top 0
+              :dot-radius 1
+              :gravity $ [] 0 -0.004 0
         |comp-city-demo $ quote
           defn comp-city-demo () $ let
               base-list $ range 14
@@ -246,6 +281,7 @@
                   :calcite $ comp-calcite-demo
                   :city $ comp-city-demo
                   :dianthus $ comp-dianthus-demo
+                  :christmas-tree $ comp-christmas-tree-demo
         |comp-dianthus-demo $ quote
           defn comp-dianthus-demo () $ object
             {} (:draw-mode :triangles)
@@ -638,6 +674,8 @@
               :position $ [] -280 0 0
             {} (:key :dianthus)
               :position $ [] -280 -40 0
+            {} (:key :christmas-tree)
+              :position $ [] -280 -80 0
         |triangle-idx! $ quote
           defn triangle-idx! () $ let
               v @*triangle-counter
@@ -671,10 +709,10 @@
           triadica.alias :refer $ object group
           triadica.math :refer $ &v+
           triadica.core :refer $ %nested-attribute >>
-          triadica.comp.tube :refer $ comp-tube comp-brush
+          triadica.comp.line :refer $ comp-tube comp-brush comp-strip-light
           triadica.comp.tabs :refer $ comp-tabs
           triadica.comp.axis :refer $ comp-axis
-          quaternion.core :refer $ &v+ &v- v-scale v-cross v-normalize
+          quaternion.core :refer $ &v+ &v- v+ v-scale v-cross v-normalize
           "\"simplex-noise" :refer $ createNoise2D
     |app.config $ {}
       :defs $ {}
@@ -689,7 +727,7 @@
         |*store $ quote
           defatom *store $ {}
             :states $ {}
-            :tab $ turn-keyword (get-env "\"tab" "\"dianthus")
+            :tab $ turn-keyword (get-env "\"tab" "\"christmas-tree")
         |canvas $ quote
           def canvas $ js/document.querySelector "\"canvas"
         |dispatch! $ quote
