@@ -10,7 +10,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
 
     - name: ACTIONS_ALLOW_UNSECURE_COMMANDS
       id: ACTIONS_ALLOW_UNSECURE_COMMANDS
@@ -29,7 +29,7 @@ jobs:
         && git clone https://github.com/Quamolit/touch-control.git
         && git clone https://github.com/mvc-works/pointed-prompt.git
         && git clone https://github.com/Respo/respo.calcit.git
-        && git clone https://github.com/Triadica/triadica-space.git --branch 0.0.25
+        && git clone https://github.com/Triadica/triadica-space.git --branch 0.0.26
         && git clone https://github.com/calcit-lang/quaternion.git
         && git clone https://github.com/calcit-lang/memof.git
 
