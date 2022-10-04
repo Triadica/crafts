@@ -82,6 +82,42 @@
                 ; :get-uniforms $ fn ()
                   js-object $ :time
                     &* 0.001 $ - (js/Date.now) start-time
+        |comp-christmas-tree-demo $ quote
+          defn comp-christmas-tree-demo () $ comp-strip-light
+            {}
+              :lines $ ->
+                [] ([] 0 0 0) ([] 600 0 100) ([] 200 0 500) ([] -100 0 -400) ([] 400 0 700)
+                map $ fn (base)
+                  let
+                      level $ + 7
+                        .floor $ * 5 (js/Math.random)
+                      size0 6
+                      r0 50
+                      top 400
+                      down 50
+                      thickness 120
+                    -> (range level)
+                      map $ fn (l-idx)
+                        let
+                            size $ + size0 (* 3 l-idx)
+                          -> (range size)
+                            map $ fn (idx)
+                              let
+                                  angle $ * 2 &PI (/ idx size)
+                                  up $ - top (* l-idx down)
+                                  r $ + r0 (* l-idx 20)
+                                {}
+                                  :from $ &v+ base ([] 0 up 0)
+                                  :to $ &v+ base
+                                    []
+                                      * r $ cos angle
+                                      - up thickness
+                                      * r $ sin angle
+                      conj $ {}
+                        :from $ v+ base ([] 0 -200 0)
+                        :to $ v+ base ([] 0 top 0)
+              :dot-radius 1
+              :gravity $ [] 0 -0.004 0
         |comp-city-demo $ quote
           defn comp-city-demo () $ let
               base-list $ range 14
@@ -219,11 +255,11 @@
                 states $ :states store
               group ({})
                 if (not hide-tabs?)
-                  comp-tabs tab-entries
+                  memof1-call comp-tabs tab-entries
                     {}
                       :position $ [] -40 0 0
                       :selected $ :tab store
-                    fn (key d!) (d! :tab key)
+                    , on-tab-change
                 case-default (:tab store)
                   do
                     js/console.warn "\"Unknown tab:" $ :tab store
@@ -246,6 +282,8 @@
                   :calcite $ comp-calcite-demo
                   :city $ comp-city-demo
                   :dianthus $ comp-dianthus-demo
+                  :christmas-tree $ comp-christmas-tree-demo
+                  :wistaria $ comp-wistaria-demo
         |comp-dianthus-demo $ quote
           defn comp-dianthus-demo () $ object
             {} (:draw-mode :triangles)
@@ -535,6 +573,92 @@
               ; :get-uniforms $ fn ()
                 js-object $ :time
                   &* 0.001 $ - (js/Date.now) start-time
+        |comp-wistaria-demo $ quote
+          defn comp-wistaria-demo () $ let
+              arc-radius 260
+              z-from -400
+              z-to 400
+              lattice-step 20
+              lattice-arc-size 20
+              vine-z-step 16
+              vine-arc-size 32
+            group ({})
+              comp-tube $ {} (; :draw-mode :line-strip)
+                :vertex-shader $ inline-shader "\"wistaria-lattice.vert"
+                :fragment-shader $ inline-shader "\"wistaria-lattice.frag"
+                :curve $ concat
+                  ->
+                    range z-from (inc z-to) lattice-step
+                    map $ fn (z)
+                      ->
+                        range $ inc lattice-arc-size
+                        map $ fn (idx)
+                          let
+                              angle $ * &PI (/ idx lattice-arc-size)
+                            {} $ :position
+                              []
+                                * arc-radius $ cos angle
+                                * arc-radius $ sin angle
+                                , z
+                  ->
+                    range $ inc lattice-arc-size
+                    map $ fn (idx)
+                      let
+                          angle $ * &PI (/ idx lattice-arc-size)
+                          x $ * arc-radius (cos angle)
+                          y $ * arc-radius (sin angle)
+                        []
+                          {} $ :position ([] x y z-from)
+                          ; {} $ :position ([] x y 0)
+                          {} $ :position ([] x y z-to)
+                :circle-step 4
+                :radius 1
+                :normal0 $ [] 1 1 0
+              comp-strip-light $ {}
+                :lines $ ->
+                  range z-from (inc z-to) vine-z-step
+                  map $ fn (z)
+                    ->
+                      range 3 $ - (inc vine-arc-size) 3
+                      map $ fn (idx)
+                        let
+                            angle $ * &PI (/ idx vine-arc-size)
+                            x $ +
+                              * arc-radius $ cos angle
+                              * 10 $ noise-2d idx (* 2 z)
+                            y $ * arc-radius (sin angle)
+                            za $ + z
+                              * 20 $ noise-2d (* 2 idx) z
+                          {}
+                            :from $ [] x y z
+                            :to $ [] x
+                              - y $ + 100
+                                * 60 $ noise-2d idx z
+                              , z
+                :fragment-shader $ inline-shader "\"wistaria.frag"
+                :dot-radius 0.4
+                :offset 4
+                :step 1
+                :gravity $ [] 0 -0.004 0
+                :color $ [] 0.7 0.6 0.45
+              object $ {} (:draw-mode :lines)
+                :vertex-shader $ inline-shader "\"lines.vert"
+                :fragment-shader $ inline-shader "\"lines.frag"
+                :packed-attrs $ []
+                  ->
+                    range z-from (inc z-to) vine-z-step
+                    map $ fn (z)
+                      []
+                        {} $ :position
+                          [] (negate arc-radius) 0 z
+                        {} $ :position ([] arc-radius 0 z)
+                  ->
+                    range (negate arc-radius) (inc arc-radius) 10
+                    map $ fn (x)
+                      []
+                        {} $ :position ([] x 0 z-from)
+                        {} $ :position ([] x 0 z-to)
+              ; comp-axis
         |connect-pieces $ quote
           defn connect-pieces (dots middle)
             ->
@@ -602,6 +726,8 @@
                     ; :idx $ - idx (* 0.5 n)
         |noise-2d $ quote
           def noise-2d $ createNoise2D
+        |on-tab-change $ quote
+          def on-tab-change $ fn (key d!) (d! :tab key)
         |rand-point $ quote
           defn rand-point (r)
             []
@@ -638,6 +764,10 @@
               :position $ [] -280 0 0
             {} (:key :dianthus)
               :position $ [] -280 -40 0
+            {} (:key :christmas-tree)
+              :position $ [] -280 -80 0
+            {} (:key :wistaria)
+              :position $ [] -280 -120 0
         |triangle-idx! $ quote
           defn triangle-idx! () $ let
               v @*triangle-counter
@@ -671,11 +801,12 @@
           triadica.alias :refer $ object group
           triadica.math :refer $ &v+
           triadica.core :refer $ %nested-attribute >>
-          triadica.comp.tube :refer $ comp-tube comp-brush
+          triadica.comp.line :refer $ comp-tube comp-brush comp-strip-light
           triadica.comp.tabs :refer $ comp-tabs
           triadica.comp.axis :refer $ comp-axis
-          quaternion.core :refer $ &v+ &v- v-scale v-cross v-normalize
+          quaternion.core :refer $ &v+ &v- v+ v-scale v-cross v-normalize
           "\"simplex-noise" :refer $ createNoise2D
+          memof.once :refer $ memof1-call
     |app.config $ {}
       :defs $ {}
         |hide-tabs? $ quote
@@ -689,7 +820,7 @@
         |*store $ quote
           defatom *store $ {}
             :states $ {}
-            :tab $ turn-keyword (get-env "\"tab" "\"dianthus")
+            :tab $ turn-keyword (get-env "\"tab" "\"wistaria")
         |canvas $ quote
           def canvas $ js/document.querySelector "\"canvas"
         |dispatch! $ quote
