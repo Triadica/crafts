@@ -588,7 +588,7 @@
                 :fragment-shader $ inline-shader "\"wistaria-lattice.frag"
                 :curve $ concat
                   ->
-                    range3 ([]) z-from (inc z-to) lattice-step
+                    range z-from (inc z-to) lattice-step
                     map $ fn (z)
                       ->
                         range $ inc lattice-arc-size
@@ -616,7 +616,7 @@
                 :normal0 $ [] 1 1 0
               comp-strip-light $ {}
                 :lines $ ->
-                  range3 ([]) z-from (inc z-to) vine-z-step
+                  range z-from (inc z-to) vine-z-step
                   map $ fn (z)
                     ->
                       range 3 $ - (inc vine-arc-size) 3
@@ -646,14 +646,14 @@
                 :fragment-shader $ inline-shader "\"lines.frag"
                 :packed-attrs $ []
                   ->
-                    range3 ([]) z-from (inc z-to) vine-z-step
+                    range z-from (inc z-to) vine-z-step
                     map $ fn (z)
                       []
                         {} $ :position
                           [] (negate arc-radius) 0 z
                         {} $ :position ([] arc-radius 0 z)
                   ->
-                    range3 ([]) (negate arc-radius) (inc arc-radius) 10
+                    range (negate arc-radius) (inc arc-radius) 10
                     map $ fn (x)
                       []
                         {} $ :position ([] x 0 z-from)
@@ -734,11 +734,6 @@
               * r $ js/Math.random
               * r $ js/Math.random
               * r $ js/Math.random
-        |range3 $ quote
-          defn range3 (acc from to step)
-            if (&< from to)
-              recur (conj acc from) (&+ from step) to step
-              , acc
         |start-time $ quote
           def start-time $ js/Date.now
         |tab-entries $ quote
