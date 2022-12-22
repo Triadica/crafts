@@ -284,6 +284,7 @@
                   :dianthus $ comp-dianthus-demo
                   :christmas-tree $ comp-christmas-tree-demo
                   :wistaria $ comp-wistaria-demo
+                  :sprial-tree $ comp-spiral-tree-demo
         |comp-dianthus-demo $ quote
           defn comp-dianthus-demo () $ object
             {} (:draw-mode :triangles)
@@ -542,6 +543,51 @@
                     fn (arm) (create-ring arm 1 r1 2)
                   -> rings $ map
                     fn (arm) (create-ring arm 0 r2 1.6)
+        |comp-spiral-tree-demo $ quote
+          defn comp-spiral-tree-demo () $ comp-strip-light
+            {}
+              :lines $ []
+                let
+                    n 40
+                    d-angle $ / (* 2 &PI) n
+                    r 200
+                  -> (range n)
+                    map $ fn (i)
+                      let
+                          angle $ * i d-angle
+                        {}
+                          :from $ [] 0 400 0
+                          :to $ []
+                            * r $ cos angle
+                            , -200
+                              * r $ sin angle
+                let
+                    n 60
+                    step 10
+                    r0 3.5
+                    d-angle $ * 6
+                      / (* 2 &PI) n
+                  -> (range n)
+                    map $ fn (i)
+                      let
+                          angle $ * i d-angle
+                          down $ * i step
+                          angle-next $ * (inc i) d-angle
+                          down-next $ * (inc i) step
+                          r $ * r0 i
+                        {}
+                          :from $ []
+                            * r $ cos angle
+                            - 400 down
+                            * r $ sin angle
+                          :to $ []
+                            * r $ cos angle-next
+                            - 400 down-next
+                            * r $ sin angle-next
+              :step 4
+              :offset 6
+              :dot-radius 1
+              :gravity $ [] 0 0 0
         |comp-tube-demo $ quote
           defn comp-tube-demo () $ let
               r 420
@@ -768,6 +814,8 @@
               :position $ [] -280 -80 0
             {} (:key :wistaria)
               :position $ [] -280 -120 0
+            {} (:key :sprial-tree)
+              :position $ [] -360 100 0
         |triangle-idx! $ quote
           defn triangle-idx! () $ let
               v @*triangle-counter
