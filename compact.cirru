@@ -284,7 +284,8 @@
                   :dianthus $ comp-dianthus-demo
                   :christmas-tree $ comp-christmas-tree-demo
                   :wistaria $ comp-wistaria-demo
-                  :sprial-tree $ comp-spiral-tree-demo
+                  :spiral-tree $ comp-spiral-tree-demo
+                  :spiral-branches $ comp-spiral-branches-demo
         |comp-dianthus-demo $ quote
           defn comp-dianthus-demo () $ object
             {} (:draw-mode :triangles)
@@ -543,6 +544,42 @@
                     fn (arm) (create-ring arm 1 r1 2)
                   -> rings $ map
                     fn (arm) (create-ring arm 0 r2 1.6)
+        |comp-spiral-branches-demo $ quote
+          defn comp-spiral-branches-demo () $ comp-strip-light
+            {}
+              :lines $ []
+                let
+                    total-down 400
+                    total-radius 160
+                    total-angle $ * 16 &PI
+                    n 280
+                    down-step $ / total-down n
+                    angle-step $ / total-angle n
+                    r-step $ / total-radius n
+                    h0 400
+                  -> (range n)
+                    map $ fn (i)
+                      let
+                          angle $ * i angle-step
+                          down $ * i down-step
+                          r $ + 20 (* i r-step)
+                          r2 $ * r 0.5
+                        {}
+                          :from $ []
+                            * r2 $ cos angle
+                            - 400 $ * 0.9 down
+                            * r2 $ sin angle
+                          :to $ []
+                            * r $ cos angle
+                            - 400 down
+                            * r $ sin angle
+                [] $ {}
+                  :from $ [] 0 400 0
+                  :to $ [] 0 -120 0
+              :step 1
+              :offset 10
+              :dot-radius 0.8
+              :gravity $ [] 0 -0.002 0
         |comp-spiral-tree-demo $ quote
           defn comp-spiral-tree-demo () $ comp-strip-light
             {}
@@ -814,8 +851,10 @@
               :position $ [] -280 -80 0
             {} (:key :wistaria)
               :position $ [] -280 -120 0
-            {} (:key :sprial-tree)
+            {} (:key :spiral-tree)
               :position $ [] -360 100 0
+            {} (:key :spiral-branches)
+              :position $ [] -360 60 0
         |triangle-idx! $ quote
           defn triangle-idx! () $ let
               v @*triangle-counter
