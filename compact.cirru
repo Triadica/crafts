@@ -286,6 +286,7 @@
                   :wistaria $ comp-wistaria-demo
                   :spiral-tree $ comp-spiral-tree-demo
                   :spiral-branches $ comp-spiral-branches-demo
+                  :jakc-tree $ comp-jakc-tree
         |comp-dianthus-demo $ quote
           defn comp-dianthus-demo () $ object
             {} (:draw-mode :triangles)
@@ -855,6 +856,8 @@
               :position $ [] -360 100 0
             {} (:key :spiral-branches)
               :position $ [] -360 60 0
+            {} (:key :jakc-tree)
+              :position $ [] -360 20 0
         |triangle-idx! $ quote
           defn triangle-idx! () $ let
               v @*triangle-counter
@@ -894,6 +897,60 @@
           quaternion.core :refer $ &v+ &v- v+ v-scale v-cross v-normalize
           "\"simplex-noise" :refer $ createNoise2D
           memof.once :refer $ memof1-call
+          app.comp.jakc-tree :refer $ comp-jakc-tree
+    |app.comp.jakc-tree $ {}
+      :defs $ {}
+        |comp-jakc-tree $ quote
+          defn comp-jakc-tree () $ let
+              radius 60
+              globe-points $ fibo-grid-range 40
+              bases $ [] ([] 0 400 0) ([] -10 350 -50) ([] -50 320 60) ([] 10 300 50) ([] -50 280 -60) ([] 60 260 70) ([] 40 250 -80) ([] -50 220 -60) ([] -40 200 60) ([] 60 150 30) ([] 50 100 30)
+            comp-segments $ {} (; :draw-mode :line-strip)
+              :fragment-shader $ inline-shader "\"jakc-tree.frag"
+              :segments $ []
+                {}
+                  :from $ [] 0 -00 0
+                  :to $ [] 0 400 0
+                -> bases $ map
+                  fn (base)
+                    []
+                      -> globe-points $ map
+                        fn (p)
+                          {} (:from base)
+                            :to $ v+ base (v-scale p radius)
+                      [] $ {}
+                        :from $ [] 0 (nth base 1) 0
+                        :to base
+              :width 2
+        |fibo-grid-n $ quote
+          defn fibo-grid-n (n total)
+            let
+                z $ dec
+                  /
+                    dec $ * 2 n
+                    , total
+                t $ sqrt
+                  - 1 $ * z z
+                t2 $ * 2 &PI n phi
+                x $ * t (cos t2)
+                y $ * t (sin t2)
+              [] x y z
+        |fibo-grid-range $ quote
+          defn fibo-grid-range (total)
+            -> (range total) (drop 1)
+              map $ fn (n) (fibo-grid-n n total)
+        |phi $ quote
+          def phi $ * 0.5
+            dec $ sqrt 5
+      :ns $ quote
+        ns app.comp.jakc-tree $ :require
+          triadica.math :refer $ &v+
+          triadica.core :refer $ %nested-attribute >>
+          triadica.comp.line :refer $ comp-tube comp-brush comp-strip-light
+          quaternion.core :refer $ &v+ &v- v+ v-scale v-cross v-normalize
+          memof.once :refer $ memof1-call
+          triadica.comp.segments :refer $ comp-segments
+          app.config :refer $ inline-shader
     |app.config $ {}
       :defs $ {}
         |hide-tabs? $ quote
@@ -907,7 +964,7 @@
         |*store $ quote
           defatom *store $ {}
             :states $ {}
-            :tab $ turn-keyword (get-env "\"tab" "\"wistaria")
+            :tab $ turn-keyword (get-env "\"tab" :jakc-tree)
         |canvas $ quote
           def canvas $ js/document.querySelector "\"canvas"
         |dispatch! $ quote
