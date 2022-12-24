@@ -902,9 +902,9 @@
       :defs $ {}
         |comp-jakc-tree $ quote
           defn comp-jakc-tree () $ let
-              radius 60
-              globe-points $ fibo-grid-range 40
-              bases $ [] ([] 0 400 0) ([] -10 350 -50) ([] -50 320 60) ([] 10 300 50) ([] -50 280 -60) ([] 60 260 70) ([] 40 250 -80) ([] -50 220 -60) ([] -40 200 60) ([] 60 150 30) ([] 50 100 30)
+              radius 48
+              globe-points $ fibo-grid-range 60
+              bases $ [] ([] 0 400 0) ([] -10 350 -50) ([] -50 320 60) ([] 10 300 50) ([] 80 290 -70) ([] -50 280 -60) ([] 60 260 40) ([] 0 250 -80) ([] 50 240 -20) ([] -50 220 -60) ([] -40 200 60) ([] 24 160 -34) ([] 60 150 30) ([] -20 100 -30)
             comp-segments $ {} (; :draw-mode :line-strip)
               :fragment-shader $ inline-shader "\"jakc-tree.frag"
               :segments $ []
@@ -922,6 +922,11 @@
                         :from $ [] 0 (nth base 1) 0
                         :to base
               :width 2
+              :get-uniforms $ fn ()
+                js-object $ :time
+                  &* 0.001 $ - (js/Date.now) start-time
+        |start-time $ quote
+          def start-time $ js/Date.now
       :ns $ quote
         ns app.comp.jakc-tree $ :require
           triadica.math :refer $ &v+
