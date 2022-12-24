@@ -922,26 +922,6 @@
                         :from $ [] 0 (nth base 1) 0
                         :to base
               :width 2
-        |fibo-grid-n $ quote
-          defn fibo-grid-n (n total)
-            let
-                z $ dec
-                  /
-                    dec $ * 2 n
-                    , total
-                t $ sqrt
-                  - 1 $ * z z
-                t2 $ * 2 &PI n phi
-                x $ * t (cos t2)
-                y $ * t (sin t2)
-              [] x y z
-        |fibo-grid-range $ quote
-          defn fibo-grid-range (total)
-            -> (range total) (drop 1)
-              map $ fn (n) (fibo-grid-n n total)
-        |phi $ quote
-          def phi $ * 0.5
-            dec $ sqrt 5
       :ns $ quote
         ns app.comp.jakc-tree $ :require
           triadica.math :refer $ &v+
@@ -949,7 +929,7 @@
           triadica.comp.line :refer $ comp-tube comp-brush comp-strip-light
           quaternion.core :refer $ &v+ &v- v+ v-scale v-cross v-normalize
           memof.once :refer $ memof1-call
-          triadica.comp.segments :refer $ comp-segments
+          triadica.comp.segments :refer $ comp-segments fibo-grid-range
           app.config :refer $ inline-shader
     |app.config $ {}
       :defs $ {}
