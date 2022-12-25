@@ -546,38 +546,6 @@
                     fn (arm) (create-ring arm 1 r1 2)
                   -> rings $ map
                     fn (arm) (create-ring arm 0 r2 1.6)
-        |comp-snowflakes-demo $ quote
-          defn comp-snowflakes-demo () $ let
-              area 400
-              d-size 8
-              placements $ -> (range 6600)
-                map $ fn (i)
-                  let
-                      p $ [] (rand-shift 0 area) (rand-shift 0 area) (rand-shift 0 area)
-                      a $ [] (rand) (rand) (rand)
-                      b $ [] (rand) (rand) (rand)
-                      c $ v-cross a b
-                      a1 $ v-normalize a
-                      c1 $ v-normalize c
-                    {} (:x a1) (:y c1) (:p p)
-                      :size $ rand d-size
-            comp-segments $ {} (; :draw-mode :line-strip)
-              :fragment-shader $ inline-shader "\"snowflake.frag"
-              :segments $ -> placements
-                map $ fn (info)
-                  let{} (x y p size) info $ -> snowflake-shape
-                    map $ fn (path)
-                      let{} (from to) path $ {}
-                        :from $ v+ p
-                          v-scale x $ * size (nth from 0)
-                          v-scale y $ * size (nth from 1)
-                        :to $ v+ p
-                          v-scale x $ * size (nth to 0)
-                          v-scale y $ * size (nth to 1)
-              :width 0.2
-              ; :get-uniforms $ fn ()
-                js-object $ :time
-                  &* 0.001 $ - (js/Date.now) start-time
         |comp-spiral-branches-demo $ quote
           defn comp-spiral-branches-demo () $ comp-strip-light
             {}
@@ -851,55 +819,6 @@
               * r $ js/Math.random
               * r $ js/Math.random
               * r $ js/Math.random
-        |snowflake-shape $ quote
-          def snowflake-shape $ []
-            {}
-              :from $ [] -1 0
-              :to $ [] 1 0
-            {}
-              :from $ [] -0.5 (* -0.5 sqrt3)
-              :to $ [] 0.5 (* 0.5 sqrt3)
-            {}
-              :from $ [] 0.5 (* -0.5 sqrt3)
-              :to $ [] -0.5 (* 0.5 sqrt3)
-            {}
-              :from $ [] 0.5 0
-              :to $ [] 0.75 (* 0.25 sqrt3)
-            {}
-              :from $ [] 0.5 0
-              :to $ [] 0.75 (* -0.25 sqrt3)
-            {}
-              :from $ [] -0.5 0
-              :to $ [] -0.75 (* 0.25 sqrt3)
-            {}
-              :from $ [] -0.5 0
-              :to $ [] -0.75 (* -0.25 sqrt3)
-            {}
-              :from $ [] 0.25 (* 0.25 sqrt3)
-              :to $ [] 0.75 (* 0.25 sqrt3)
-            {}
-              :from $ [] -0.25 (* 0.25 sqrt3)
-              :to $ [] -0.75 (* 0.25 sqrt3)
-            {}
-              :from $ [] 0.25 (* -0.25 sqrt3)
-              :to $ [] 0.75 (* -0.25 sqrt3)
-            {}
-              :from $ [] -0.25 (* -0.25 sqrt3)
-              :to $ [] -0.75 (* -0.25 sqrt3)
-            {}
-              :from $ [] 0 (* 0.5 sqrt3)
-              :to $ [] 0.25 (* 0.25 sqrt3)
-            {}
-              :from $ [] 0 (* 0.5 sqrt3)
-              :to $ [] -0.25 (* 0.25 sqrt3)
-            {}
-              :from $ [] 0 (* -0.5 sqrt3)
-              :to $ [] 0.25 (* -0.25 sqrt3)
-            {}
-              :from $ [] 0 (* -0.5 sqrt3)
-              :to $ [] -0.25 (* -0.25 sqrt3)
-        |sqrt3 $ quote
-          def sqrt3 $ sqrt 3
         |start-time $ quote
           def start-time $ js/Date.now
         |tab-entries $ quote
@@ -983,7 +902,7 @@
           memof.once :refer $ memof1-call
           app.comp.jakc-tree :refer $ comp-jakc-tree
           triadica.comp.segments :refer $ comp-segments
-          "\"@calcit/std" :refer $ rand rand-int rand-shift
+          app.comp.snowflakes :refer $ comp-snowflakes-demo
     |app.comp.jakc-tree $ {}
       :defs $ {}
         |comp-jakc-tree $ quote
@@ -1022,6 +941,100 @@
           memof.once :refer $ memof1-call
           triadica.comp.segments :refer $ comp-segments fibo-grid-range
           app.config :refer $ inline-shader
+    |app.comp.snowflakes $ {}
+      :defs $ {}
+        |comp-snowflakes-demo $ quote
+          defn comp-snowflakes-demo () $ let
+              area 320
+              d-size 2.2
+              placements $ -> (range 8000)
+                map $ fn (i)
+                  let
+                      p $ [] (rand-shift 0 area) (rand-shift 0 area) (rand-shift 0 area)
+                      a $ [] (rand) (rand) (rand)
+                      b $ [] (rand) (rand) (rand)
+                      c $ v-cross a b
+                      a1 $ v-normalize a
+                      c1 $ v-normalize c
+                    {} (:x a1) (:y c1) (:p p)
+                      :size $ pow (rand d-size) 2
+                conj $ {}
+                  :x $ [] 1 0 0
+                  :y $ [] 0 1 0
+                  :p $ [] 0 0 0
+                  :size 4
+            comp-segments $ {} (; :draw-mode :line-strip)
+              :fragment-shader $ inline-shader "\"snowflake.frag"
+              :segments $ -> placements
+                map $ fn (info)
+                  let{} (x y p size) info $ -> snowflake-shape
+                    map $ fn (path)
+                      let{} (from to) path $ {}
+                        :from $ v+ p
+                          v-scale x $ * size (nth from 0)
+                          v-scale y $ * size (nth from 1)
+                        :to $ v+ p
+                          v-scale x $ * size (nth to 0)
+                          v-scale y $ * size (nth to 1)
+              :width 0.12
+              ; :get-uniforms $ fn ()
+                js-object $ :time
+                  &* 0.001 $ - (js/Date.now) start-time
+        |snowflake-rotation $ quote
+          def snowflake-rotation $ [] 0.5 (* 0.5 sqrt3)
+        |snowflake-shape $ quote
+          def snowflake-shape $ let
+              branch0 $ []
+                {}
+                  :from $ [] 0 0
+                  :to $ [] 1 0
+                {}
+                  :from $ [] 0 0
+                  :to $ [] 0.24 0.16
+                {}
+                  :from $ [] 0.6 0
+                  :to $ [] 0.84 0.34
+                {}
+                  :from $ [] 0.6 0
+                  :to $ [] 0.84 -0.34
+                {}
+                  :from $ [] 0.3 0
+                  :to $ [] 0.56 0.26
+                {}
+                  :from $ [] 0.3 0
+                  :to $ [] 0.56 -0.26
+                {}
+                  :from $ [] 0.80 0
+                  :to $ [] 0.92 0.16
+                {}
+                  :from $ [] 0.80 0
+                  :to $ [] 0.92 -0.16
+              branches $ apply-args (branch0 branch0 5)
+                fn (acc template level)
+                  if (= level 0) acc $ let
+                      xs $ -> template
+                        map $ fn (info)
+                          let
+                              from $ :from info
+                              to $ :to info
+                            {}
+                              :from $ &c* from snowflake-rotation
+                              :to $ &c* to snowflake-rotation
+                    recur (concat acc xs) xs $ dec level
+            ; js/console.log branches
+            , branches
+        |sqrt3 $ quote
+          def sqrt3 $ sqrt 3
+      :ns $ quote
+        ns app.comp.snowflakes $ :require
+          triadica.math :refer $ &v+
+          triadica.core :refer $ %nested-attribute >>
+          triadica.comp.line :refer $ comp-tube comp-brush comp-strip-light
+          quaternion.core :refer $ &v+ &v- v+ v-scale v-cross v-normalize &c*
+          memof.once :refer $ memof1-call
+          triadica.comp.segments :refer $ comp-segments fibo-grid-range
+          app.config :refer $ inline-shader
+          "\"@calcit/std" :refer $ rand rand-int rand-shift
     |app.config $ {}
       :defs $ {}
         |hide-tabs? $ quote
