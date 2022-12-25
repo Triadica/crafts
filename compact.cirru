@@ -287,6 +287,7 @@
                   :spiral-tree $ comp-spiral-tree-demo
                   :spiral-branches $ comp-spiral-branches-demo
                   :jakc-tree $ comp-jakc-tree
+                  :snowflakes $ comp-snowflakes-demo
         |comp-dianthus-demo $ quote
           defn comp-dianthus-demo () $ object
             {} (:draw-mode :triangles)
@@ -545,6 +546,38 @@
                     fn (arm) (create-ring arm 1 r1 2)
                   -> rings $ map
                     fn (arm) (create-ring arm 0 r2 1.6)
+        |comp-snowflakes-demo $ quote
+          defn comp-snowflakes-demo () $ let
+              area 400
+              d-size 8
+              placements $ -> (range 6600)
+                map $ fn (i)
+                  let
+                      p $ [] (rand-shift 0 area) (rand-shift 0 area) (rand-shift 0 area)
+                      a $ [] (rand) (rand) (rand)
+                      b $ [] (rand) (rand) (rand)
+                      c $ v-cross a b
+                      a1 $ v-normalize a
+                      c1 $ v-normalize c
+                    {} (:x a1) (:y c1) (:p p)
+                      :size $ rand d-size
+            comp-segments $ {} (; :draw-mode :line-strip)
+              :fragment-shader $ inline-shader "\"snowflake.frag"
+              :segments $ -> placements
+                map $ fn (info)
+                  let{} (x y p size) info $ -> snowflake-shape
+                    map $ fn (path)
+                      let{} (from to) path $ {}
+                        :from $ v+ p
+                          v-scale x $ * size (nth from 0)
+                          v-scale y $ * size (nth from 1)
+                        :to $ v+ p
+                          v-scale x $ * size (nth to 0)
+                          v-scale y $ * size (nth to 1)
+              :width 0.2
+              ; :get-uniforms $ fn ()
+                js-object $ :time
+                  &* 0.001 $ - (js/Date.now) start-time
         |comp-spiral-branches-demo $ quote
           defn comp-spiral-branches-demo () $ comp-strip-light
             {}
@@ -818,6 +851,55 @@
               * r $ js/Math.random
               * r $ js/Math.random
               * r $ js/Math.random
+        |snowflake-shape $ quote
+          def snowflake-shape $ []
+            {}
+              :from $ [] -1 0
+              :to $ [] 1 0
+            {}
+              :from $ [] -0.5 (* -0.5 sqrt3)
+              :to $ [] 0.5 (* 0.5 sqrt3)
+            {}
+              :from $ [] 0.5 (* -0.5 sqrt3)
+              :to $ [] -0.5 (* 0.5 sqrt3)
+            {}
+              :from $ [] 0.5 0
+              :to $ [] 0.75 (* 0.25 sqrt3)
+            {}
+              :from $ [] 0.5 0
+              :to $ [] 0.75 (* -0.25 sqrt3)
+            {}
+              :from $ [] -0.5 0
+              :to $ [] -0.75 (* 0.25 sqrt3)
+            {}
+              :from $ [] -0.5 0
+              :to $ [] -0.75 (* -0.25 sqrt3)
+            {}
+              :from $ [] 0.25 (* 0.25 sqrt3)
+              :to $ [] 0.75 (* 0.25 sqrt3)
+            {}
+              :from $ [] -0.25 (* 0.25 sqrt3)
+              :to $ [] -0.75 (* 0.25 sqrt3)
+            {}
+              :from $ [] 0.25 (* -0.25 sqrt3)
+              :to $ [] 0.75 (* -0.25 sqrt3)
+            {}
+              :from $ [] -0.25 (* -0.25 sqrt3)
+              :to $ [] -0.75 (* -0.25 sqrt3)
+            {}
+              :from $ [] 0 (* 0.5 sqrt3)
+              :to $ [] 0.25 (* 0.25 sqrt3)
+            {}
+              :from $ [] 0 (* 0.5 sqrt3)
+              :to $ [] -0.25 (* 0.25 sqrt3)
+            {}
+              :from $ [] 0 (* -0.5 sqrt3)
+              :to $ [] 0.25 (* -0.25 sqrt3)
+            {}
+              :from $ [] 0 (* -0.5 sqrt3)
+              :to $ [] -0.25 (* -0.25 sqrt3)
+        |sqrt3 $ quote
+          def sqrt3 $ sqrt 3
         |start-time $ quote
           def start-time $ js/Date.now
         |tab-entries $ quote
@@ -858,6 +940,8 @@
               :position $ [] -360 60 0
             {} (:key :jakc-tree)
               :position $ [] -360 20 0
+            {} (:key :snowflakes)
+              :position $ [] -360 -20 0
         |triangle-idx! $ quote
           defn triangle-idx! () $ let
               v @*triangle-counter
@@ -898,6 +982,8 @@
           "\"simplex-noise" :refer $ createNoise2D
           memof.once :refer $ memof1-call
           app.comp.jakc-tree :refer $ comp-jakc-tree
+          triadica.comp.segments :refer $ comp-segments
+          "\"@calcit/std" :refer $ rand rand-int rand-shift
     |app.comp.jakc-tree $ {}
       :defs $ {}
         |comp-jakc-tree $ quote
