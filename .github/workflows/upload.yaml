@@ -12,6 +12,11 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 16
+        cache: 'yarn'
+
     - name: ACTIONS_ALLOW_UNSECURE_COMMANDS
       id: ACTIONS_ALLOW_UNSECURE_COMMANDS
       run: echo 'ACTIONS_ALLOW_UNSECURE_COMMANDS=true' >> $GITHUB_ENV
@@ -29,7 +34,7 @@ jobs:
         && git clone https://github.com/Quamolit/touch-control.git
         && git clone https://github.com/mvc-works/pointed-prompt.git
         && git clone https://github.com/Respo/respo.calcit.git
-        && git clone https://github.com/Triadica/triadica-space.git --branch 0.0.28
+        && git clone https://github.com/Triadica/triadica-space.git --branch 0.0.29
         && git clone https://github.com/calcit-lang/quaternion.git
         && git clone https://github.com/calcit-lang/memof.git
 
