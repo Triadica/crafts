@@ -284,6 +284,10 @@
                   :dianthus $ comp-dianthus-demo
                   :christmas-tree $ comp-christmas-tree-demo
                   :wistaria $ comp-wistaria-demo
+                  :spiral-tree $ comp-spiral-tree-demo
+                  :spiral-branches $ comp-spiral-branches-demo
+                  :jakc-tree $ comp-jakc-tree
+                  :snowflakes $ comp-snowflakes-demo
         |comp-dianthus-demo $ quote
           defn comp-dianthus-demo () $ object
             {} (:draw-mode :triangles)
@@ -542,6 +546,87 @@
                     fn (arm) (create-ring arm 1 r1 2)
                   -> rings $ map
                     fn (arm) (create-ring arm 0 r2 1.6)
+        |comp-spiral-branches-demo $ quote
+          defn comp-spiral-branches-demo () $ comp-strip-light
+            {}
+              :lines $ []
+                let
+                    total-down 400
+                    total-radius 160
+                    total-angle $ * 16 &PI
+                    n 280
+                    down-step $ / total-down n
+                    angle-step $ / total-angle n
+                    r-step $ / total-radius n
+                    h0 400
+                  -> (range n)
+                    map $ fn (i)
+                      let
+                          angle $ * i angle-step
+                          down $ * i down-step
+                          r $ + 20 (* i r-step)
+                          r2 $ * r 0.5
+                        {}
+                          :from $ []
+                            * r2 $ cos angle
+                            - 400 $ * 0.9 down
+                            * r2 $ sin angle
+                          :to $ []
+                            * r $ cos angle
+                            - 400 down
+                            * r $ sin angle
+                [] $ {}
+                  :from $ [] 0 400 0
+                  :to $ [] 0 -120 0
+              :step 1
+              :offset 10
+              :dot-radius 0.8
+              :gravity $ [] 0 -0.002 0
+        |comp-spiral-tree-demo $ quote
+          defn comp-spiral-tree-demo () $ comp-strip-light
+            {}
+              :lines $ []
+                let
+                    n 40
+                    d-angle $ / (* 2 &PI) n
+                    r 200
+                  -> (range n)
+                    map $ fn (i)
+                      let
+                          angle $ * i d-angle
+                        {}
+                          :from $ [] 0 400 0
+                          :to $ []
+                            * r $ cos angle
+                            , -200
+                              * r $ sin angle
+                let
+                    n 60
+                    step 10
+                    r0 3.5
+                    d-angle $ * 6
+                      / (* 2 &PI) n
+                  -> (range n)
+                    map $ fn (i)
+                      let
+                          angle $ * i d-angle
+                          down $ * i step
+                          angle-next $ * (inc i) d-angle
+                          down-next $ * (inc i) step
+                          r $ * r0 i
+                        {}
+                          :from $ []
+                            * r $ cos angle
+                            - 400 down
+                            * r $ sin angle
+                          :to $ []
+                            * r $ cos angle-next
+                            - 400 down-next
+                            * r $ sin angle-next
+              :step 4
+              :offset 6
+              :dot-radius 1
+              :gravity $ [] 0 0 0
         |comp-tube-demo $ quote
           defn comp-tube-demo () $ let
               r 420
@@ -768,6 +853,14 @@
               :position $ [] -280 -80 0
             {} (:key :wistaria)
               :position $ [] -280 -120 0
+            {} (:key :spiral-tree)
+              :position $ [] -360 100 0
+            {} (:key :spiral-branches)
+              :position $ [] -360 60 0
+            {} (:key :jakc-tree)
+              :position $ [] -360 20 0
+            {} (:key :snowflakes)
+              :position $ [] -360 -20 0
         |triangle-idx! $ quote
           defn triangle-idx! () $ let
               v @*triangle-counter
@@ -807,6 +900,141 @@
           quaternion.core :refer $ &v+ &v- v+ v-scale v-cross v-normalize
           "\"simplex-noise" :refer $ createNoise2D
           memof.once :refer $ memof1-call
+          app.comp.jakc-tree :refer $ comp-jakc-tree
+          triadica.comp.segments :refer $ comp-segments
+          app.comp.snowflakes :refer $ comp-snowflakes-demo
+    |app.comp.jakc-tree $ {}
+      :defs $ {}
+        |comp-jakc-tree $ quote
+          defn comp-jakc-tree () $ let
+              radius 48
+              globe-points $ fibo-grid-range 60
+              bases $ [] ([] 0 400 0) ([] -10 350 -50) ([] -50 320 60) ([] 10 300 50) ([] 80 290 -70) ([] -50 280 -60) ([] 60 260 40) ([] 0 250 -80) ([] 50 240 -20) ([] -50 220 -60) ([] -40 200 60) ([] 24 160 -34) ([] 60 150 30) ([] -20 100 -30)
+            comp-segments $ {} (; :draw-mode :line-strip)
+              :fragment-shader $ inline-shader "\"jakc-tree.frag"
+              :segments $ []
+                {}
+                  :from $ [] 0 -00 0
+                  :to $ [] 0 400 0
+                -> bases $ map
+                  fn (base)
+                    []
+                      -> globe-points $ map
+                        fn (p)
+                          {} (:from base)
+                            :to $ v+ base (v-scale p radius)
+                      [] $ {}
+                        :from $ [] 0 (nth base 1) 0
+                        :to base
+              :width 2
+              :get-uniforms $ fn ()
+                js-object $ :time
+                  &* 0.001 $ - (js/Date.now) start-time
+        |start-time $ quote
+          def start-time $ js/Date.now
+      :ns $ quote
+        ns app.comp.jakc-tree $ :require
+          triadica.math :refer $ &v+
+          triadica.core :refer $ %nested-attribute >>
+          triadica.comp.line :refer $ comp-tube comp-brush comp-strip-light
+          quaternion.core :refer $ &v+ &v- v+ v-scale v-cross v-normalize
+          memof.once :refer $ memof1-call
+          triadica.comp.segments :refer $ comp-segments fibo-grid-range
+          app.config :refer $ inline-shader
+    |app.comp.snowflakes $ {}
+      :defs $ {}
+        |comp-snowflakes-demo $ quote
+          defn comp-snowflakes-demo () $ let
+              area 320
+              d-size 2.2
+              placements $ -> (range 8000)
+                map $ fn (i)
+                  let
+                      p $ [] (rand-shift 0 area) (rand-shift 0 area) (rand-shift 0 area)
+                      a $ [] (rand) (rand) (rand)
+                      b $ [] (rand) (rand) (rand)
+                      c $ v-cross a b
+                      a1 $ v-normalize a
+                      c1 $ v-normalize c
+                    {} (:x a1) (:y c1) (:p p)
+                      :size $ pow (rand d-size) 2
+                conj $ {}
+                  :x $ [] 1 0 0
+                  :y $ [] 0 1 0
+                  :p $ [] 0 0 0
+                  :size 4
+            comp-segments $ {} (; :draw-mode :line-strip)
+              :fragment-shader $ inline-shader "\"snowflake.frag"
+              :segments $ -> placements
+                map $ fn (info)
+                  let{} (x y p size) info $ -> snowflake-shape
+                    map $ fn (path)
+                      let{} (from to) path $ {}
+                        :from $ v+ p
+                          v-scale x $ * size (nth from 0)
+                          v-scale y $ * size (nth from 1)
+                        :to $ v+ p
+                          v-scale x $ * size (nth to 0)
+                          v-scale y $ * size (nth to 1)
+              :width 0.12
+              ; :get-uniforms $ fn ()
+                js-object $ :time
+                  &* 0.001 $ - (js/Date.now) start-time
+        |snowflake-rotation $ quote
+          def snowflake-rotation $ [] 0.5 (* 0.5 sqrt3)
+        |snowflake-shape $ quote
+          def snowflake-shape $ let
+              branch0 $ []
+                {}
+                  :from $ [] 0 0
+                  :to $ [] 1 0
+                {}
+                  :from $ [] 0 0
+                  :to $ [] 0.24 0.16
+                {}
+                  :from $ [] 0.6 0
+                  :to $ [] 0.84 0.34
+                {}
+                  :from $ [] 0.6 0
+                  :to $ [] 0.84 -0.34
+                {}
+                  :from $ [] 0.3 0
+                  :to $ [] 0.56 0.26
+                {}
+                  :from $ [] 0.3 0
+                  :to $ [] 0.56 -0.26
+                {}
+                  :from $ [] 0.80 0
+                  :to $ [] 0.92 0.16
+                {}
+                  :from $ [] 0.80 0
+                  :to $ [] 0.92 -0.16
+              branches $ apply-args (branch0 branch0 5)
+                fn (acc template level)
+                  if (= level 0) acc $ let
+                      xs $ -> template
+                        map $ fn (info)
+                          let
+                              from $ :from info
+                              to $ :to info
+                            {}
+                              :from $ &c* from snowflake-rotation
+                              :to $ &c* to snowflake-rotation
+                    recur (concat acc xs) xs $ dec level
+            ; js/console.log branches
+            , branches
+        |sqrt3 $ quote
+          def sqrt3 $ sqrt 3
+      :ns $ quote
+        ns app.comp.snowflakes $ :require
+          triadica.math :refer $ &v+
+          triadica.core :refer $ %nested-attribute >>
+          triadica.comp.line :refer $ comp-tube comp-brush comp-strip-light
+          quaternion.core :refer $ &v+ &v- v+ v-scale v-cross v-normalize &c*
+          memof.once :refer $ memof1-call
+          triadica.comp.segments :refer $ comp-segments fibo-grid-range
+          app.config :refer $ inline-shader
+          "\"@calcit/std" :refer $ rand rand-int rand-shift
     |app.config $ {}
       :defs $ {}
         |hide-tabs? $ quote
@@ -820,7 +1048,7 @@
         |*store $ quote
           defatom *store $ {}
             :states $ {}
-            :tab $ turn-keyword (get-env "\"tab" "\"wistaria")
+            :tab $ turn-keyword (get-env "\"tab" :jakc-tree)
         |canvas $ quote
           def canvas $ js/document.querySelector "\"canvas"
         |dispatch! $ quote
