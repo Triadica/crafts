@@ -288,6 +288,7 @@
                   :spiral-branches $ comp-spiral-branches-demo
                   :jakc-tree $ comp-jakc-tree
                   :snowflakes $ comp-snowflakes-demo
+                  :dense-tree $ comp-dense-tree-demo
         |comp-dianthus-demo $ quote
           defn comp-dianthus-demo () $ object
             {} (:draw-mode :triangles)
@@ -861,6 +862,8 @@
               :position $ [] -360 20 0
             {} (:key :snowflakes)
               :position $ [] -360 -20 0
+            {} (:key :dense-tree)
+              :position $ [] -360 -60 0
         |triangle-idx! $ quote
           defn triangle-idx! () $ let
               v @*triangle-counter
@@ -903,6 +906,61 @@
           app.comp.jakc-tree :refer $ comp-jakc-tree
           triadica.comp.segments :refer $ comp-segments
           app.comp.snowflakes :refer $ comp-snowflakes-demo
+          app.comp.dense-tree :refer $ comp-dense-tree-demo
+    |app.comp.dense-tree $ {}
+      :defs $ {}
+        |comp-dense-tree-demo $ quote
+          defn comp-dense-tree-demo () $ comp-segments
+            {} (; :draw-mode :line-strip)
+              ; :fragment-shader $ inline-shader "\"snowflake.frag"
+              :segments $ []
+                make-dense-branch ([] 0 -200 0) ([] 0 400 0) ([] 1 0 0) 0.5 161 1.5 151 1.6 1
+                [] $ {}
+                  :from $ [] 0 -200 0
+                  :to $ [] 0 200 0
+              :width 0.5
+              ; :get-uniforms $ fn ()
+                js-object $ :time
+                  &* 0.001 $ - (js/Date.now) start-time
+        |make-dense-branch $ quote
+          defn make-dense-branch (origin base v0 branch-ratio size total-pitch total-angle r1 level )
+            let
+                base-length $ v-length base
+                base-direction $ v-normalize base
+                branch-length (* branch-ratio base-length) 
+                v0-direction $ v-normalize v0
+                h-direction $ v-normalize (v-cross v0-direction base)
+              []
+                {} (:from origin)
+                  :to $ v+ origin base
+                -> (range size)
+                  map $ fn (idx)
+                    let
+                        ratio $ + 0.2
+                          * 0.8 $ &/ idx size
+                        ratio-inv $ &- 1 ratio
+                        pitch $ * total-pitch (pow ratio-inv r1)
+                        angle $ * total-angle ratio-inv
+                        from $ v+ origin (v-scale base ratio)
+                        rot-direction $ v+
+                          v-scale v0-direction $ cos angle
+                          v-scale h-direction $ sin angle
+                        v $ v+
+                          v-scale base-direction $ * branch-length (cos pitch)
+                          v-scale rot-direction $ * branch-length (sin pitch)
+                      if (<= level 0)
+                        {} (:from from)
+                          :to $ v+ from v
+                        make-dense-branch from v base 0.24 226 1.5 125 1.2 $ dec level
+      :ns $ quote
+        ns app.comp.dense-tree $ :require
+          triadica.math :refer $ &v+
+          triadica.core :refer $ %nested-attribute >>
+          triadica.comp.line :refer $ comp-tube comp-brush comp-strip-light
+          quaternion.core :refer $ &v+ &v- v+ v-scale v-cross v-normalize v-length
+          memof.once :refer $ memof1-call
+          triadica.comp.segments :refer $ comp-segments fibo-grid-range
+          app.config :refer $ inline-shader
     |app.comp.jakc-tree $ {}
       :defs $ {}
         |comp-jakc-tree $ quote
@@ -1048,7 +1106,7 @@
         |*store $ quote
           defatom *store $ {}
             :states $ {}
-            :tab $ turn-keyword (get-env "\"tab" :jakc-tree)
+            :tab $ turn-keyword (get-env "\"tab" :dense-tree)
         |canvas $ quote
           def canvas $ js/document.querySelector "\"canvas"
         |dispatch! $ quote
