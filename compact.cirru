@@ -289,6 +289,7 @@
                   :jakc-tree $ comp-jakc-tree
                   :snowflakes $ comp-snowflakes-demo
                   :dense-tree $ comp-dense-tree-demo
+                  :dandelions $ comp-dandelions-demo
         |comp-dianthus-demo $ quote
           defn comp-dianthus-demo () $ object
             {} (:draw-mode :triangles)
@@ -864,6 +865,8 @@
               :position $ [] -360 -20 0
             {} (:key :dense-tree)
               :position $ [] -360 -60 0
+            {} (:key :dandelions)
+              :position $ [] -360 -100 0
         |triangle-idx! $ quote
           defn triangle-idx! () $ let
               v @*triangle-counter
@@ -907,6 +910,75 @@
           triadica.comp.segments :refer $ comp-segments
           app.comp.snowflakes :refer $ comp-snowflakes-demo
           app.comp.dense-tree :refer $ comp-dense-tree-demo
+          app.comp.dandelions :refer $ comp-dandelions-demo
+    |app.comp.dandelions $ {}
+      :defs $ {}
+        |comp-dandelions-demo $ quote
+          defn comp-dandelions-demo () $ let
+              large-globe $ fibo-grid-range 60
+            group ({})
+              comp-segments $ {} (; :draw-mode :line-strip)
+                :fragment-shader $ inline-shader "\"dandelions.frag"
+                :segments $ []
+                  -> large-globe $ map
+                    fn (p)
+                      draw-umbrella ([] 0 0 0) p
+                  -> (range 600)
+                    map $ fn (idx)
+                      let
+                          origin $ [] (rand-shift 0 2400) (rand-shift 0 1200) (rand-shift 0 2000)
+                        draw-umbrella origin $ v-normalize
+                          [] (rand-shift 80 100) (rand 100) (rand 2)
+                :width 0.3
+                ; :get-uniforms $ fn ()
+                  js-object $ :time
+                    &* 0.001 $ - (js/Date.now) start-time
+              comp-segments $ {}
+                :segments $ {}
+                  :from $ [] 0 0 0
+                  :to $ [] 30 -400 0
+                :width 6
+        |draw-umbrella $ quote
+          defn draw-umbrella (origin p)
+            let
+                rot-direction $ v-normalize (v-cross p up)
+                h-direction $ v-cross rot-direction p
+                p0 $ v-scale p 14
+                p1 $ v-scale p 120
+              []
+                {} (:from origin)
+                  :to $ v+ origin p1
+                  :color-index 0
+                -> (range 60)
+                  map $ fn (idx0)
+                    let
+                        idx $ + idx0 40
+                        spin $ * idx 0.4
+                        pitch $ * idx 0.0068
+                        r 62
+                        v $ v+
+                          v-scale rot-direction $ * r (cos spin)
+                          v-scale h-direction $ * r (sin spin)
+                        v2 $ v+
+                          v-scale p $ * r (sin pitch)
+                          v-scale v $ cos pitch
+                      {}
+                        :from $ v+ origin p1 (v-scale v2 0.01)
+                        :to $ v+ origin p1 v2
+                        :color-index 1
+        |up $ quote
+          def up $ [] 0 1 0
+      :ns $ quote
+        ns app.comp.dandelions $ :require
+          triadica.math :refer $ &v+
+          triadica.core :refer $ %nested-attribute >>
+          triadica.comp.line :refer $ comp-tube comp-brush comp-strip-light
+          quaternion.core :refer $ &v+ &v- v+ v-scale v-cross v-normalize v-length
+          memof.once :refer $ memof1-call
+          triadica.comp.segments :refer $ comp-segments fibo-grid-range
+          triadica.alias :refer $ object group
+          app.config :refer $ inline-shader
+          "\"@calcit/std" :refer $ rand-int rand rand-shift
     |app.comp.dense-tree $ {}
       :defs $ {}
         |comp-dense-tree-demo $ quote
@@ -1106,7 +1178,7 @@
         |*store $ quote
           defatom *store $ {}
             :states $ {}
-            :tab $ turn-keyword (get-env "\"tab" :dense-tree)
+            :tab $ turn-keyword (get-env "\"tab" :dandelions)
         |canvas $ quote
           def canvas $ js/document.querySelector "\"canvas"
         |dispatch! $ quote
