@@ -10,7 +10,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - uses: actions/setup-node@v3
       with:
@@ -34,7 +34,7 @@ jobs:
         && git clone https://github.com/Quamolit/touch-control.git
         && git clone https://github.com/mvc-works/pointed-prompt.git
         && git clone https://github.com/Respo/respo.calcit.git
-        && git clone https://github.com/Triadica/triadica-space.git --branch 0.0.29
+        && git clone https://github.com/Triadica/triadica-space.git --branch 0.0.32
         && git clone https://github.com/calcit-lang/quaternion.git
         && git clone https://github.com/calcit-lang/memof.git
 
@@ -46,7 +46,7 @@ jobs:
 
     - name: Deploy to server
       id: deploy
-      uses: Pendect/action-rsyncer@v1.1.0
+      uses: Pendect/action-rsyncer@v2.0.0
       env:
         DEPLOY_KEY: ${{secrets.rsync_private_key}}
       with:

@@ -288,6 +288,8 @@
                   :spiral-branches $ comp-spiral-branches-demo
                   :jakc-tree $ comp-jakc-tree
                   :snowflakes $ comp-snowflakes-demo
+                  :dense-tree $ comp-dense-tree-demo
+                  :dandelions $ comp-dandelions-demo
         |comp-dianthus-demo $ quote
           defn comp-dianthus-demo () $ object
             {} (:draw-mode :triangles)
@@ -861,6 +863,10 @@
               :position $ [] -360 20 0
             {} (:key :snowflakes)
               :position $ [] -360 -20 0
+            {} (:key :dense-tree)
+              :position $ [] -360 -60 0
+            {} (:key :dandelions)
+              :position $ [] -360 -100 0
         |triangle-idx! $ quote
           defn triangle-idx! () $ let
               v @*triangle-counter
@@ -903,6 +909,130 @@
           app.comp.jakc-tree :refer $ comp-jakc-tree
           triadica.comp.segments :refer $ comp-segments
           app.comp.snowflakes :refer $ comp-snowflakes-demo
+          app.comp.dense-tree :refer $ comp-dense-tree-demo
+          app.comp.dandelions :refer $ comp-dandelions-demo
+    |app.comp.dandelions $ {}
+      :defs $ {}
+        |comp-dandelions-demo $ quote
+          defn comp-dandelions-demo () $ let
+              large-globe $ fibo-grid-range 60
+            group ({})
+              comp-segments $ {} (; :draw-mode :line-strip)
+                :fragment-shader $ inline-shader "\"dandelions.frag"
+                :segments $ []
+                  -> large-globe $ map
+                    fn (p)
+                      draw-umbrella ([] 0 0 0) p
+                  -> (range 600)
+                    map $ fn (idx)
+                      let
+                          origin $ [] (rand-shift 0 2400) (rand-shift 0 1200) (rand-shift 0 2000)
+                        draw-umbrella origin $ v-normalize
+                          [] (rand-shift 80 100) (rand 100) (rand 2)
+                :width 0.3
+                ; :get-uniforms $ fn ()
+                  js-object $ :time
+                    &* 0.001 $ - (js/Date.now) start-time
+              comp-segments $ {}
+                :segments $ {}
+                  :from $ [] 0 0 0
+                  :to $ [] 30 -400 0
+                :width 6
+        |draw-umbrella $ quote
+          defn draw-umbrella (origin p)
+            let
+                rot-direction $ v-normalize (v-cross p up)
+                h-direction $ v-cross rot-direction p
+                p0 $ v-scale p 14
+                p1 $ v-scale p 120
+              []
+                {} (:from origin)
+                  :to $ v+ origin p1
+                  :color-index 0
+                -> (range 60)
+                  map $ fn (idx0)
+                    let
+                        idx $ + idx0 40
+                        spin $ * idx 0.4
+                        pitch $ * idx 0.0068
+                        r 62
+                        v $ v+
+                          v-scale rot-direction $ * r (cos spin)
+                          v-scale h-direction $ * r (sin spin)
+                        v2 $ v+
+                          v-scale p $ * r (sin pitch)
+                          v-scale v $ cos pitch
+                      {}
+                        :from $ v+ origin p1 (v-scale v2 0.01)
+                        :to $ v+ origin p1 v2
+                        :color-index 1
+        |up $ quote
+          def up $ [] 0 1 0
+      :ns $ quote
+        ns app.comp.dandelions $ :require
+          triadica.math :refer $ &v+
+          triadica.core :refer $ %nested-attribute >>
+          triadica.comp.line :refer $ comp-tube comp-brush comp-strip-light
+          quaternion.core :refer $ &v+ &v- v+ v-scale v-cross v-normalize v-length
+          memof.once :refer $ memof1-call
+          triadica.comp.segments :refer $ comp-segments fibo-grid-range
+          triadica.alias :refer $ object group
+          app.config :refer $ inline-shader
+          "\"@calcit/std" :refer $ rand-int rand rand-shift
+    |app.comp.dense-tree $ {}
+      :defs $ {}
+        |comp-dense-tree-demo $ quote
+          defn comp-dense-tree-demo () $ comp-segments
+            {} (; :draw-mode :line-strip)
+              ; :fragment-shader $ inline-shader "\"snowflake.frag"
+              :segments $ []
+                make-dense-branch ([] 0 -200 0) ([] 0 400 0) ([] 1 0 0) 0.5 161 1.5 151 1.6 1
+                [] $ {}
+                  :from $ [] 0 -200 0
+                  :to $ [] 0 200 0
+              :width 0.5
+              ; :get-uniforms $ fn ()
+                js-object $ :time
+                  &* 0.001 $ - (js/Date.now) start-time
+        |make-dense-branch $ quote
+          defn make-dense-branch (origin base v0 branch-ratio size total-pitch total-angle r1 level )
+            let
+                base-length $ v-length base
+                base-direction $ v-normalize base
+                branch-length (* branch-ratio base-length) 
+                v0-direction $ v-normalize v0
+                h-direction $ v-normalize (v-cross v0-direction base)
+              []
+                {} (:from origin)
+                  :to $ v+ origin base
+                -> (range size)
+                  map $ fn (idx)
+                    let
+                        ratio $ + 0.2
+                          * 0.8 $ &/ idx size
+                        ratio-inv $ &- 1 ratio
+                        pitch $ * total-pitch (pow ratio-inv r1)
+                        angle $ * total-angle ratio-inv
+                        from $ v+ origin (v-scale base ratio)
+                        rot-direction $ v+
+                          v-scale v0-direction $ cos angle
+                          v-scale h-direction $ sin angle
+                        v $ v+
+                          v-scale base-direction $ * branch-length (cos pitch)
+                          v-scale rot-direction $ * branch-length (sin pitch)
+                      if (<= level 0)
+                        {} (:from from)
+                          :to $ v+ from v
+                        make-dense-branch from v base 0.24 226 1.5 125 1.2 $ dec level
+      :ns $ quote
+        ns app.comp.dense-tree $ :require
+          triadica.math :refer $ &v+
+          triadica.core :refer $ %nested-attribute >>
+          triadica.comp.line :refer $ comp-tube comp-brush comp-strip-light
+          quaternion.core :refer $ &v+ &v- v+ v-scale v-cross v-normalize v-length
+          memof.once :refer $ memof1-call
+          triadica.comp.segments :refer $ comp-segments fibo-grid-range
+          app.config :refer $ inline-shader
     |app.comp.jakc-tree $ {}
       :defs $ {}
         |comp-jakc-tree $ quote
@@ -1048,7 +1178,7 @@
         |*store $ quote
           defatom *store $ {}
             :states $ {}
-            :tab $ turn-keyword (get-env "\"tab" :jakc-tree)
+            :tab $ turn-keyword (get-env "\"tab" :dandelions)
         |canvas $ quote
           def canvas $ js/document.querySelector "\"canvas"
         |dispatch! $ quote
