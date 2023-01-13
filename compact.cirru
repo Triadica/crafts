@@ -254,7 +254,7 @@
             let
                 states $ :states store
               group ({})
-                if (not hide-tabs?)
+                ; if (not hide-tabs?)
                   memof1-call comp-tabs tab-entries
                     {}
                       :position $ [] -40 0 0
@@ -290,6 +290,7 @@
                   :snowflakes $ comp-snowflakes-demo
                   :dense-tree $ comp-dense-tree-demo
                   :dandelions $ comp-dandelions-demo
+                  :whirlpool $ comp-whirlpool
         |comp-dianthus-demo $ quote
           defn comp-dianthus-demo () $ object
             {} (:draw-mode :triangles)
@@ -867,6 +868,8 @@
               :position $ [] -360 -60 0
             {} (:key :dandelions)
               :position $ [] -360 -100 0
+            {} (:key :whirlpool)
+              :position $ [] -360 -140 0
         |triangle-idx! $ quote
           defn triangle-idx! () $ let
               v @*triangle-counter
@@ -911,6 +914,7 @@
           app.comp.snowflakes :refer $ comp-snowflakes-demo
           app.comp.dense-tree :refer $ comp-dense-tree-demo
           app.comp.dandelions :refer $ comp-dandelions-demo
+          app.comp.whirlpool :refer $ comp-whirlpool
     |app.comp.dandelions $ {}
       :defs $ {}
         |comp-dandelions-demo $ quote
@@ -970,12 +974,12 @@
           def up $ [] 0 1 0
       :ns $ quote
         ns app.comp.dandelions $ :require
-          triadica.math :refer $ &v+
+          triadica.math :refer $ &v+ fibo-grid-range
           triadica.core :refer $ %nested-attribute >>
           triadica.comp.line :refer $ comp-tube comp-brush comp-strip-light
           quaternion.core :refer $ &v+ &v- v+ v-scale v-cross v-normalize v-length
           memof.once :refer $ memof1-call
-          triadica.comp.segments :refer $ comp-segments fibo-grid-range
+          triadica.comp.segments :refer $ comp-segments
           triadica.alias :refer $ object group
           app.config :refer $ inline-shader
           "\"@calcit/std" :refer $ rand-int rand rand-shift
@@ -1064,12 +1068,12 @@
           def start-time $ js/Date.now
       :ns $ quote
         ns app.comp.jakc-tree $ :require
-          triadica.math :refer $ &v+
+          triadica.math :refer $ &v+ fibo-grid-range
           triadica.core :refer $ %nested-attribute >>
           triadica.comp.line :refer $ comp-tube comp-brush comp-strip-light
           quaternion.core :refer $ &v+ &v- v+ v-scale v-cross v-normalize
           memof.once :refer $ memof1-call
-          triadica.comp.segments :refer $ comp-segments fibo-grid-range
+          triadica.comp.segments :refer $ comp-segments
           app.config :refer $ inline-shader
     |app.comp.snowflakes $ {}
       :defs $ {}
@@ -1165,6 +1169,45 @@
           triadica.comp.segments :refer $ comp-segments fibo-grid-range
           app.config :refer $ inline-shader
           "\"@calcit/std" :refer $ rand rand-int rand-shift
+    |app.comp.whirlpool $ {}
+      :defs $ {}
+        |comp-whirlpool $ quote
+          defn comp-whirlpool () $ comp-segments-curves
+            {}
+              :fragment-shader $ inline-shader "\"whirlpool.frag"
+              :curves $ let
+                  size 200
+                -> (range 320)
+                  map $ fn (rot)
+                    -> (range size)
+                      map $ fn (idx)
+                        {} (:color-index idx) (:width 5)
+                          :position $ do
+                            let
+                                r $ * (+ 4 idx) 10
+                                theta $ + (* 0.03 rot)
+                                  * (pow idx 0.6) 0.3
+                              []
+                                * r $ cos theta
+                                - 40 $ / 40000 idx
+                                * r $ sin theta
+                            ; [] (* 10 rot) (* idx 1) 0
+              :get-uniforms $ fn ()
+                js-object $ :time
+                  &* 0.01 $ - start (js/Date.now)
+        |start $ quote
+          def start $ js/Date.now
+      :ns $ quote
+        ns app.comp.whirlpool $ :require
+          triadica.math :refer $ &v+ fibo-grid-range
+          triadica.core :refer $ %nested-attribute >>
+          triadica.comp.line :refer $ comp-tube comp-brush comp-strip-light
+          quaternion.core :refer $ &v+ &v- v+ v-scale v-cross v-normalize v-length
+          memof.once :refer $ memof1-call
+          triadica.comp.segments :refer $ comp-segments comp-segments-curves
+          triadica.alias :refer $ object group
+          app.config :refer $ inline-shader
+          "\"@calcit/std" :refer $ rand-int rand rand-shift
     |app.config $ {}
       :defs $ {}
         |hide-tabs? $ quote
@@ -1178,7 +1221,7 @@
         |*store $ quote
           defatom *store $ {}
             :states $ {}
-            :tab $ turn-keyword (get-env "\"tab" :dandelions)
+            :tab $ turn-keyword (get-env "\"tab" :whirlpool)
         |canvas $ quote
           def canvas $ js/document.querySelector "\"canvas"
         |dispatch! $ quote
