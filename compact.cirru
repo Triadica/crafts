@@ -254,7 +254,7 @@
             let
                 states $ :states store
               group ({})
-                ; if (not hide-tabs?)
+                if (not hide-tabs?)
                   memof1-call comp-tabs tab-entries
                     {}
                       :position $ [] -40 0 0
@@ -1177,14 +1177,14 @@
               :fragment-shader $ inline-shader "\"whirlpool.frag"
               :curves $ let
                   size 200
-                -> (range 320)
+                -> (range 400)
                   map $ fn (rot)
                     -> (range size)
                       map $ fn (idx)
-                        {} (:color-index idx) (:width 5)
+                        {} (:color-index idx) (:width 8)
                           :position $ do
                             let
-                                r $ * (+ 4 idx) 10
+                                r $ * (+ 1 idx) 20
                                 theta $ + (* 0.03 rot)
                                   * (pow idx 0.6) 0.3
                               []
