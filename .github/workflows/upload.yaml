@@ -34,7 +34,7 @@ jobs:
         && git clone https://github.com/Quamolit/touch-control.git
         && git clone https://github.com/mvc-works/pointed-prompt.git
         && git clone https://github.com/Respo/respo.calcit.git
-        && git clone https://github.com/Triadica/triadica-space.git --branch 0.0.35
+        && git clone https://github.com/Triadica/triadica-space.git --branch 0.0.36
         && git clone https://github.com/calcit-lang/quaternion.git
         && git clone https://github.com/calcit-lang/memof.git
 

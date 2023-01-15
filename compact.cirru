@@ -1079,12 +1079,14 @@
       :defs $ {}
         |comp-snowflakes-demo $ quote
           defn comp-snowflakes-demo () $ let
-              area 320
+              area 240
               d-size 2.2
               placements $ -> (range 8000)
                 map $ fn (i)
                   let
-                      p $ [] (rand-shift 0 area) (rand-shift 0 area) (rand-shift 0 area)
+                      p $ [] (rand-shift 0 area)
+                        do (rand-shift 0 area) 0
+                        rand-shift 0 area
                       a $ [] (rand) (rand) (rand)
                       b $ [] (rand) (rand) (rand)
                       c $ v-cross a b
@@ -1099,21 +1101,42 @@
                   :size 4
             comp-segments $ {} (; :draw-mode :line-strip)
               :fragment-shader $ inline-shader "\"snowflake.frag"
+              :vertex-shader $ inline-shader "\"snowflake.vert"
               :segments $ -> placements
                 map $ fn (info)
-                  let{} (x y p size) info $ -> snowflake-shape
-                    map $ fn (path)
-                      let{} (from to) path $ {}
-                        :from $ v+ p
-                          v-scale x $ * size (nth from 0)
-                          v-scale y $ * size (nth from 1)
-                        :to $ v+ p
-                          v-scale x $ * size (nth to 0)
-                          v-scale y $ * size (nth to 1)
+                  let-sugar
+                        {} x y p size
+                        , info
+                      picked-shape $ case-default (rand-int 7) snowflake-shape-sparse (0 snowflake-shape) (1 snowflake-shape-bare) (2 snowflake-shape-sparse) (3 snowflake-shape-hairy) (4 snowflake-shape-ring) (5 snowflake-shape-branch) (6 snowflake-shape-star)
+                      seed $ rand 20
+                    -> picked-shape $ map
+                      fn (path)
+                        let{} (from to) path $ {}
+                          :from $ v+ p
+                            v-scale x $ * size (nth from 0)
+                            v-scale y $ * size (nth from 1)
+                          :to $ v+ p
+                            v-scale x $ * size (nth to 0)
+                            v-scale y $ * size (nth to 1)
+                          :color-index seed
               :width 0.12
-              ; :get-uniforms $ fn ()
+              :get-uniforms $ fn ()
                 js-object $ :time
-                  &* 0.001 $ - (js/Date.now) start-time
+                  &* 0.08 $ - (js/performance.now) start-time
+        |rotate-branches $ quote
+          defn rotate-branches (branch0)
+            apply-args (branch0 branch0 5)
+              fn (acc template level)
+                if (= level 0) acc $ let
+                    xs $ -> template
+                      map $ fn (info)
+                        let
+                            from $ :from info
+                            to $ :to info
+                          {}
+                            :from $ &c* from snowflake-rotation
+                            :to $ &c* to snowflake-rotation
+                  recur (concat acc xs) xs $ dec level
         |snowflake-rotation $ quote
           def snowflake-rotation $ [] 0.5 (* 0.5 sqrt3)
         |snowflake-shape $ quote
@@ -1143,22 +1166,100 @@
                 {}
                   :from $ [] 0.80 0
                   :to $ [] 0.92 -0.16
-              branches $ apply-args (branch0 branch0 5)
-                fn (acc template level)
-                  if (= level 0) acc $ let
-                      xs $ -> template
-                        map $ fn (info)
-                          let
-                              from $ :from info
-                              to $ :to info
-                            {}
-                              :from $ &c* from snowflake-rotation
-                              :to $ &c* to snowflake-rotation
-                    recur (concat acc xs) xs $ dec level
+              branches $ rotate-branches branch0
+            ; js/console.log branches
+            , branches
+        |snowflake-shape-bare $ quote
+          def snowflake-shape-bare $ let
+              branch0 $ []
+                {}
+                  :from $ [] 0 0
+                  :to $ [] 0.6 0
+              branches $ rotate-branches branch0
+            ; js/console.log branches
+            , branches
+        |snowflake-shape-branch $ quote
+          def snowflake-shape-branch $ let
+              branch0 $ []
+                {}
+                  :from $ [] 0 0
+                  :to $ [] 0.8 0
+                {}
+                  :from $ [] 0 0
+                  :to $ [] 0.4 0.16
+              branches $ rotate-branches branch0
+            ; js/console.log branches
+            , branches
+        |snowflake-shape-hairy $ quote
+          def snowflake-shape-hairy $ let
+              branch0 $ []
+                {}
+                  :from $ [] 0 0
+                  :to $ [] 1 0
+                {}
+                  :from $ [] 0.6 0
+                  :to $ [] 0.84 0.34
+                {}
+                  :from $ [] 0.6 0
+                  :to $ [] 0.84 -0.34
+                {}
+                  :from $ [] 0.7 0
+                  :to $ [] 0.9 0.27
+                {}
+                  :from $ [] 0.7 0
+                  :to $ [] 0.9 -0.27
+                {}
+                  :from $ [] 0.80 0
+                  :to $ [] 0.92 0.16
+                {}
+                  :from $ [] 0.80 0
+                  :to $ [] 0.92 -0.16
+              branches $ rotate-branches branch0
+            ; js/console.log branches
+            , branches
+        |snowflake-shape-ring $ quote
+          def snowflake-shape-ring $ let
+              branch0 $ []
+                {}
+                  :from $ [] 0.4 0.44
+                  :to $ [] 0.4 -0.44
+              branches $ rotate-branches branch0
+            ; js/console.log branches
+            , branches
+        |snowflake-shape-sparse $ quote
+          def snowflake-shape-sparse $ let
+              branch0 $ []
+                {}
+                  :from $ [] 0 0
+                  :to $ [] 0.9 0
+                {}
+                  :from $ [] 0.32 0
+                  :to $ [] 0.66 0.54
+                {}
+                  :from $ [] 0.32 0
+                  :to $ [] 0.66 -0.54
+              branches $ rotate-branches branch0
+            ; js/console.log branches
+            , branches
+        |snowflake-shape-star $ quote
+          def snowflake-shape-star $ let
+              branch0 $ []
+                {}
+                  :from $ [] 0 0
+                  :to $ [] 0.8 0
+                {}
+                  :from $ [] 0.42 0.12
+                  :to $ [] 0.58 -0.12
+                {}
+                  :from $ [] 0.58 0.12
+                  :to $ [] 0.42 -0.12
+              branches $ rotate-branches branch0
             ; js/console.log branches
             , branches
         |sqrt3 $ quote
           def sqrt3 $ sqrt 3
+        |start-time $ quote
+          def start-time $ js/performance.now
       :ns $ quote
         ns app.comp.snowflakes $ :require
           triadica.math :refer $ &v+
