@@ -15,6 +15,43 @@
                   fn (d2) ([] d1 d2)
               filter $ fn (ab)
                 not= (nth ab 0) (nth ab 1)
+        |comp-3d-cycloid-demo $ quote
+          defn comp-3d-cycloid-demo () $ let
+              r1 $ * 120 (js/Math.random)
+              r2 $ * 100 (js/Math.random)
+              r3 $ * 80 (js/Math.random)
+              v1 $ * 0.04 (js/Math.random)
+              v2 $ * 0.08 (js/Math.random)
+              v3 $ * 0.16 (js/Math.random)
+            group ({})
+              comp-segments-curves $ {} (; :draw-mode :line-strip)
+                :fragment-shader $ inline-shader "\"3d-cycloid.frag"
+                :curves $ []
+                  -> (range 2400)
+                    map $ fn (idx)
+                      let
+                          t1 $ * v1 idx
+                          t2 $ * v2 idx
+                          t3 $ * v3 idx
+                          p1 $ []
+                            * r1 $ cos t1
+                            , 0
+                              * r2 $ sin t1
+                          p2 $ []
+                            * r2 $ cos t2
+                            , 0
+                              * r2 $ sin t2
+                          p3 $ [] 0
+                            * r3 $ cos t3
+                            * r3 $ sin t3
+                        {}
+                          :position $ v+ p1 p2 p3
+                          :width 0.8
+              comp-button
+                {} (:size 2)
+                  :position $ [] 0 40 0
+                  :color $ [] 0.24 0.8 0.5
+                fn (e d!) (d! :inc nil)
         |comp-calcite-demo $ quote
           defn comp-calcite-demo () $ let
               size 12
@@ -291,6 +328,7 @@
                   :dense-tree $ comp-dense-tree-demo
                   :dandelions $ comp-dandelions-demo
                   :whirlpool $ comp-whirlpool
+                  :3d-cycloid $ comp-3d-cycloid-demo
         |comp-dianthus-demo $ quote
           defn comp-dianthus-demo () $ object
             {} (:draw-mode :triangles)
@@ -870,6 +908,8 @@
               :position $ [] -360 -100 0
             {} (:key :whirlpool)
               :position $ [] -360 -140 0
+            {} (:key :3d-cycloid)
+              :position $ [] -360 -180 0
         |triangle-idx! $ quote
           defn triangle-idx! () $ let
               v @*triangle-counter
@@ -901,17 +941,18 @@
           app.config :refer $ inline-shader hide-tabs?
           triadica.config :as t-config
           triadica.alias :refer $ object group
-          triadica.math :refer $ &v+
+          triadica.math :refer $ &v+ v+
           triadica.core :refer $ %nested-attribute >>
           triadica.comp.line :refer $ comp-tube comp-brush
           triadica.comp.bunch :refer $ comp-strip-light
           triadica.comp.tabs :refer $ comp-tabs
           triadica.comp.axis :refer $ comp-axis
+          triadica.comp.drag-point :refer $ comp-button
           quaternion.core :refer $ &v+ &v- v+ v-scale v-cross v-normalize
           "\"simplex-noise" :refer $ createNoise2D
           memof.once :refer $ memof1-call
           app.comp.jakc-tree :refer $ comp-jakc-tree
-          triadica.comp.segments :refer $ comp-segments
+          triadica.comp.segments :refer $ comp-segments comp-segments-curves
           app.comp.snowflakes :refer $ comp-snowflakes-demo
           app.comp.dense-tree :refer $ comp-dense-tree-demo
           app.comp.dandelions :refer $ comp-dandelions-demo
@@ -1323,7 +1364,8 @@
         |*store $ quote
           defatom *store $ {}
             :states $ {}
-            :tab $ turn-keyword (get-env "\"tab" :whirlpool)
+            :tab $ turn-keyword (get-env "\"tab" :3d-cycloid)
+            :counter 0
         |canvas $ quote
           def canvas $ js/document.querySelector "\"canvas"
         |dispatch! $ quote
@@ -1335,6 +1377,7 @@
                   do (js/console.warn "\"unknown op" op) nil
                   :states $ update-states store data
                   :tab $ assoc store :tab data
+                  :inc $ update store :counter inc
               if (some? next) (reset! *store next)
         |main! $ quote
           defn main! ()
@@ -1350,6 +1393,7 @@
             add-watch *store :change $ fn (v _p) (render-app!)
             set! js/window.onresize $ fn (event) (reset-canvas-size! canvas) (render-app!)
             setup-mouse-events! canvas
+            ; flipped js/setInterval 4000 $ fn () (dispatch! :inc nil)
         |reload! $ quote
           defn reload! () $ if (nil? build-errors)
             do (remove-watch *store :change)
