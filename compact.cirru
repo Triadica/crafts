@@ -903,7 +903,8 @@
           triadica.alias :refer $ object group
           triadica.math :refer $ &v+
           triadica.core :refer $ %nested-attribute >>
-          triadica.comp.line :refer $ comp-tube comp-brush comp-strip-light
+          triadica.comp.line :refer $ comp-tube comp-brush
+          triadica.comp.bunch :refer $ comp-strip-light
           triadica.comp.tabs :refer $ comp-tabs
           triadica.comp.axis :refer $ comp-axis
           quaternion.core :refer $ &v+ &v- v+ v-scale v-cross v-normalize

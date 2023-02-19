@@ -6536,7 +6536,13 @@
                       :data $ {}
                         |T $ {} (:at 1661847679949) (:by |u0) (:text |comp-tube) (:type :leaf)
                         |b $ {} (:at 1661847684882) (:by |u0) (:text |comp-brush) (:type :leaf)
-                        |h $ {} (:at 1664718418042) (:by |u0) (:text |comp-strip-light) (:type :leaf)
+                |sT $ {} (:at 1676824633429) (:by |u0) (:type :expr)
+                  :data $ {}
+                    |T $ {} (:at 1676824636488) (:by |u0) (:text |triadica.comp.bunch) (:type :leaf)
+                    |b $ {} (:at 1676824638606) (:by |u0) (:text |:refer) (:type :leaf)
+                    |h $ {} (:at 1676824639076) (:by |u0) (:type :expr)
+                      :data $ {}
+                        |T $ {} (:at 1676824642521) (:by |u0) (:text |comp-strip-light) (:type :leaf)
                 |t $ {} (:at 1662360881546) (:by |u0) (:type :expr)
                   :data $ {}
                     |T $ {} (:at 1662360884057) (:by |u0) (:text |triadica.comp.tabs) (:type :leaf)
