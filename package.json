@@ -1,18 +1,19 @@
 {
-  "name": "triadica-workflow",
+  "name": "triadica-crafts",
+  "private": true,
+  "packageManager": "yarn@4.18.0",
   "version": "0.0.1",
-  "main": "index.js",
-  "repository": "git@github.com:Quatrefoil-GL/triadica-workflow.git",
+  "repository": "git@github.com:Triadica/crafts.git",
   "author": "tiye <jiyinyiyong@gmail.com>",
   "license": "MIT",
   "devDependencies": {
     "bottom-tip": "^0.1.5",
-    "vite": "^5.0.10"
+    "vite": "8.3.4"
   },
   "dependencies": {
-    "@calcit/procs": "^0.8.14",
-    "@calcit/std": "^0.0.3",
-    "@quamolit/touch-control": "^0.0.13",
+    "@calcit/procs": "0.29.1",
+    "@calcit/std": "0.0.3",
+    "@triadica/touch-control": "0.0.3",
     "mobile-detect": "^1.4.5",
     "simplex-noise": "^4.0.1",
     "twgl.js": "^5.5.3"
