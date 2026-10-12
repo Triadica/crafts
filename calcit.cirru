@@ -454,10 +454,7 @@
                         inc $ negate pieces
                         , pieces
                       map $ fn (j) ([] i j)
-              comp-tube $ {} (; :draw-mode :line-strip) (:circle-step 7) (:radius 16)
-                :vertex-shader $ inline-shader |mesh.vert
-                :fragment-shader $ inline-shader |mesh.frag
-                :curve $ -> lines-grid $ map
+                curves $ -> lines-grid $ map
                   fn (base)
                     -> (range segments)
                       map $ fn (idx)
@@ -473,14 +470,19 @@
                             +
                               * 80 $ .unwrap $ nth base 1
                               ; * ri $ cos angle
-                :post-hook $ fn (d)
-                  hint-fn $ {}
-                    :args $ [] $ :: 'List (:: 'Map 'Tag 'Dynamic)
-                    :return $ :: 'List $ :: 'Map 'Tag 'Dynamic
-                  map d $ fn (di)
-                    let
-                        idx $ triangle-idx!
-                      assoc di :idx $ floor $ - (/ idx 3) 3
+                vertices $ -> curves $ mapcat
+                  fn (curve)
+                    ->
+                      triadica.comp.line/build-tube-points curve 16 ([] 0 0 1) 7
+                      mapcat identity
+                      mapcat identity
+              object $ {} (:draw-mode :triangles)
+                :vertex-shader $ inline-shader |mesh.vert
+                :fragment-shader $ inline-shader |mesh.frag
+                :packed-attrs $ map vertices $ fn (di)
+                  let
+                      idx $ triangle-idx!
+                    assoc di :idx $ floor $ - (/ idx 3) 3
           :examples $ []
           :schema $ :: 'Fn $ {}
             :args $ []
@@ -911,7 +913,7 @@
           :code $ quote $ def dots
             [] ([] 1 1 1) ([] 1 1 -1) ([] 1 -1 1) ([] 1 -1 -1) ([] -1 1 1) ([] -1 1 -1) ([] -1 -1 1) ([] -1 -1 -1) ([] 0 0 1.414) ([] 0 0 -1.414) ([] 0 1.414 0) ([] 0 -1.414 0) ([] 1.414 0 0) ([] -1.414 0 0)
           :examples $ []
-          :schema $ :: 'Dynamic
+          :schema $ :: 'List $ :: 'List 'Number
         'fibers-grid $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def fibers-grid
             let
@@ -957,12 +959,17 @@
         'noise-2d $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def noise-2d (createNoise2D)
           :examples $ []
-          :schema $ :: 'Dynamic
+          :schema $ :: 'Fn $ {} (:return 'Number)
+            :args $ [] 'Number 'Number
+            :features $ #{} :js-ffi
         'on-tab-change $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def on-tab-change
             fn (key d!) (d! :tab key)
           :examples $ []
-          :schema $ :: 'Dynamic
+          :schema $ :: 'Fn $ {} (:return 'Unit)
+            :args $ [] 'Tag $ :: 'Fn
+              {} (:return 'Unit)
+                :args $ [] 'Tag 'Tag
         'rand-point $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn rand-point (r)
             []
@@ -1160,7 +1167,7 @@
         'up $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def up ([] 0 1 0)
           :examples $ []
-          :schema $ :: 'Dynamic
+          :schema $ :: 'List 'Number
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns app.comp.dandelions
           :require
@@ -1502,7 +1509,7 @@
         'sqrt3 $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def sqrt3 (sqrt 3)
           :examples $ []
-          :schema $ :: 'Dynamic
+          :schema $ :: 'Number
         'start-time $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def start-time (shared/performance-now)
           :examples $ []
