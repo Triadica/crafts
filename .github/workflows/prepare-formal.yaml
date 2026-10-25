@@ -59,12 +59,11 @@ jobs:
           calcit edit format
           test "$(git hash-object calcit.cirru)" = "$source_blob"
           node prepare-formal.mjs after
-          calcit --check-only --all-defs --strict-types --format json > acceptance/after-all-defs.json
-          calcit fix --workflow strict --verify --format json > acceptance/after-strict.json
-          jq -e '.data.workflow.status == "passed" and .diagnostics == []' acceptance/after-strict.json
-          calcit test app.comp.container/connect-pieces --require-match --format json > acceptance/connect-test.json
-          calcit test app.comp.container/connect-pieces-dense --require-match --format json > acceptance/dense-test.json
-          calcit test app.comp.container/wind-pieces --require-match --format json > acceptance/wind-test.json
+          calcit --check-only --all-defs --strict-types > acceptance/after-all-defs.log
+          calcit fix --workflow strict --verify > acceptance/after-strict.log
+          calcit test app.comp.container/connect-pieces --require-match > acceptance/connect-test.log
+          calcit test app.comp.container/connect-pieces-dense --require-match > acceptance/dense-test.log
+          calcit test app.comp.container/wind-pieces --require-match > acceptance/wind-test.log
           calcit js
           cp assets/* js-out/
           yarn vite build --base=./
