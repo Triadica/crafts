@@ -15,13 +15,17 @@ concurrency:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7.0.1
+      with:
+        persist-credentials: false
 
-    - uses: actions/setup-node@v6
+    - uses: actions/setup-node@v6.5.0
       with:
         node-version: 24
+        package-manager-cache: false
 
     - name: Enable Corepack
       run: |
@@ -29,15 +33,31 @@ jobs:
         corepack prepare yarn@4.18.0 --activate
 
     - uses: calcit-lang/setup-calcit@v1.5.0
+      with:
+        tools: calcit,caps
+        deps-file: deps.cirru
+        caps-version: "0.1.1"
 
     - name: Install dependencies
       run: caps --strict --ci && yarn install --immutable && caps verify --toolchain
 
     - name: Validate source and types
       run: |
+        set -euo pipefail
+        test ! -e compact.cirru
+        test ! -e package.cirru
+        source_blob="$(git hash-object calcit.cirru)"
         calcit edit format
-        git diff --exit-code -- calcit.cirru
+        test "$(git hash-object calcit.cirru)" = "$source_blob"
         calcit --check-only --all-defs --strict-types
+        calcit --check-only --ns 'app.$meta' --ns app.comp.container \
+          --ns app.comp.dandelions --ns app.comp.dense-tree --ns app.comp.jakc-tree \
+          --ns app.comp.snowflakes --ns app.comp.whirlpool --ns app.config \
+          --ns app.main --ns app.schema
+        calcit fix --workflow strict --verify
+        calcit test app.comp.container/connect-pieces --require-match
+        calcit test app.comp.container/connect-pieces-dense --require-match
+        calcit test app.comp.container/wind-pieces --require-match
 
     - name: Select frontend CDN path
       id: asset-path
