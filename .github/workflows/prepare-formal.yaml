@@ -51,7 +51,7 @@ jobs:
         run: |
           set -euo pipefail
           caps --ci --strict
-          yarn install
+          YARN_ENABLE_IMMUTABLE_INSTALLS=false yarn install
           yarn install --immutable
           caps verify --toolchain
           node prepare-formal.mjs apply
