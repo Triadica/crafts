@@ -41,6 +41,9 @@ jobs:
           cp assets/* js-out/
           yarn vite build --base=./
           node prepare-formal.mjs before-js
+          test -z "$(git ls-files -- js-out)"
+          test -d js-out
+          rm -r -- js-out
           node prepare-formal.mjs manifests
       - uses: calcit-lang/setup-calcit@v1.5.0
         with:
