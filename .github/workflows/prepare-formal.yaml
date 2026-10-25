@@ -36,7 +36,7 @@ jobs:
           source_blob="$(git hash-object calcit.cirru)"
           calcit edit format
           test "$(git hash-object calcit.cirru)" = "$source_blob"
-          calcit --check-only --all-defs --strict-types --format json > acceptance/before-all-defs.json
+          calcit --check-only --all-defs --strict-types > acceptance/before-all-defs.log
           calcit js
           cp assets/* js-out/
           yarn vite build --base=./
