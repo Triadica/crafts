@@ -1,0 +1,98 @@
+name: Protected Crafts formal Calcit migration
+on:
+  push:
+    branches: [prepare/crafts-formal-0301]
+permissions:
+  contents: read
+jobs:
+  prepare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6.5.0
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - uses: calcit-lang/setup-calcit@v1.5.0
+        with:
+          tools: calcit,caps
+          deps-file: deps.cirru
+          caps-version: "0.1.1"
+      - name: Exact original 0.29.1 gates
+        run: |
+          set -euo pipefail
+          corepack enable
+          corepack prepare yarn@4.18.0 --activate
+          mkdir -p acceptance
+          caps --ci --strict
+          yarn install --immutable
+          caps verify --toolchain
+          test ! -e compact.cirru
+          test ! -e package.cirru
+          node prepare-formal.mjs before
+          source_blob="$(git hash-object calcit.cirru)"
+          calcit edit format
+          test "$(git hash-object calcit.cirru)" = "$source_blob"
+          calcit --check-only --all-defs --strict-types --format json > acceptance/before-all-defs.json
+          calcit js
+          cp assets/* js-out/
+          yarn vite build --base=./
+          node prepare-formal.mjs before-js
+          node prepare-formal.mjs manifests
+      - uses: calcit-lang/setup-calcit@v1.5.0
+        with:
+          tools: calcit,caps
+          deps-file: deps.cirru
+          caps-version: "0.1.1"
+      - name: Formal exact source transaction and full original gates
+        run: |
+          set -euo pipefail
+          caps --ci --strict
+          yarn install
+          yarn install --immutable
+          caps verify --toolchain
+          node prepare-formal.mjs apply
+          source_blob="$(git hash-object calcit.cirru)"
+          calcit edit format
+          test "$(git hash-object calcit.cirru)" = "$source_blob"
+          node prepare-formal.mjs after
+          calcit --check-only --all-defs --strict-types --format json > acceptance/after-all-defs.json
+          calcit fix --workflow strict --verify --format json > acceptance/after-strict.json
+          jq -e '.data.workflow.status == "passed" and .diagnostics == []' acceptance/after-strict.json
+          calcit test app.comp.container/connect-pieces --require-match --format json > acceptance/connect-test.json
+          calcit test app.comp.container/connect-pieces-dense --require-match --format json > acceptance/dense-test.json
+          calcit test app.comp.container/wind-pieces --require-match --format json > acceptance/wind-test.json
+          calcit js
+          cp assets/* js-out/
+          yarn vite build --base=./
+          node prepare-formal.mjs after-js
+          node prepare-formal.mjs after
+      - uses: actions/upload-artifact@v7.0.2
+        if: success()
+        with:
+          name: accepted-source
+          path: |
+            calcit.cirru
+            deps.cirru
+            package.json
+            .yarnrc.yml
+            yarn.lock
+          include-hidden-files: true
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v7.0.2
+        if: success()
+        with:
+          name: accepted-runtime
+          path: |
+            js-out/
+            dist/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v7.0.2
+        if: always()
+        with:
+          name: diagnostics
+          path: acceptance/
+          if-no-files-found: warn
