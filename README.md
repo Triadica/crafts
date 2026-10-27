@@ -2,23 +2,22 @@
 
 - Demo https://r.tiye.me/Triadica/crafts/
 
-### 迁移候选：尚未完成运行验收
+### Calcit 0.31.0 迁移候选
 
-本分支暂不合并或部署，线上 Demo 不变。源码已通过正式 0.30.1 的完整 strict、
-实际 69/69 定义检查和三项原生几何测试，但当前正式 Space 0.0.44 / js-ffi 0.2.5
-存在已记录的 canvas 查询字段合同错误，见 [Space #64](https://github.com/Triadica/triadica-space/issues/64#issuecomment-6370145806)。
-维护修复 [Space #70](https://github.com/Triadica/triadica-space/pull/70) 已由外部合并，
-尚缺正式 Git tag 0.0.45；依赖发布后仍须在本项目重新检查并做真实 WebGL 验收，不能以编译通过代替。
+本分支升级到正式 Calcit 0.31.0，尚未合并或部署。画布初始化改用已发布的
+Space 0.0.46 / js-ffi 0.2.7，旧版 canvas 合同阻塞已在本项目实际页面中不再复现。
+本地构建已验证初始场景、两个标签的几何切换及刷新恢复，控制台无警告或错误；
+未覆盖全部场景、移动端、手柄与热更新，不把这次验收视为全功能证明。
 
 ### Workflow
 
 https://github.com/Triadica/triadica-workflow
 
-源码使用 `calcit.cirru` 与 `deps.cirru`，Calcit / `@calcit/procs` 固定为正式版 `0.30.1`。使用 Node 24、Yarn 4.18，依次运行 `caps --strict --ci`、`yarn install --immutable`、`caps verify --toolchain`、`calcit --check-only --all-defs --strict-types`、`calcit fix --workflow strict --verify` 和 `calcit js`，再运行 `yarn vite`。生成的 `js-out/` 不进入仓库，不恢复 compact.cirru/package.cirru。
+源码使用 `calcit.cirru` 与 `deps.cirru`，Calcit / `@calcit/procs` 固定为正式版 `0.31.0`。使用 Node 24、Yarn 4.18，依次运行 `caps --strict --ci`、`yarn install --immutable`、`caps verify --toolchain`、`calcit --check-only --all-defs --strict-types`、`calcit fix --workflow strict --verify` 和 `calcit js`，再运行 `yarn vite`。生成的 `js-out/` 不进入仓库，不恢复 compact.cirru/package.cirru。
 
-当前候选固定正式 Space 0.0.44、Touch Control 0.0.32、Respo 0.16.124、Quaternion 0.2.16、
-Memof 0.0.40、js-ffi 0.2.5，保持一致图，不使用未发布 tag、main、哈希或 root override。
-这不是已完成的可部署依赖图，以上 canvas 风险尚未解除。
+当前候选使用已发布的 Space 0.0.46、Touch Control 0.0.34、Respo 0.17.0-alpha.4、
+Quaternion 0.2.17、Memof 0.0.41、js-ffi 0.2.7；Respo 仍为已发布 alpha 模块，
+不使用未发布 tag、main、哈希或 root override。Calcit CLI 与 JS runtime 均为正式 0.31.0。
 
 类型收敛只改真实边界：局部环形顶点函数声明实际参数合同；外部 JS 随机值组成的两个向量各检查一次
 List<Number>，正常数值路径保留原随机调用顺序/参数，非法返回值会更早报错；异构控件状态的 assoc-in
@@ -31,7 +30,7 @@ Placement/Store 使用直接构造器，保留字段和值；状态路径用 con
 先运行原 0.29.1 的门禁和构建，再运行正式 0.30.1 的完整门禁。
 新增的三个定义附带测试分别固定三角形端点/中心、四边形六顶点顺序、dense 的 400 步及首 quad，
 均显式选择并各 1/1 通过；原项目没有附带测试，不把它们称为原有测试。
-strict 状态 passed、源码建议为 0，但仍有 7 项类型审阅提示、24 处保留边界和 35 处 FFI 边界，
+本轮 0.31.0 全定义检查、三个几何测试与 Vite 构建通过；完整 strict 状态 passed、源码建议为 0，但仍有 7 项类型审阅提示、24 处保留边界和 29 处 FFI 边界，
 不宣称类型债务清零。应用生成差异已独立审阅，不宣称升级后的整个编译器/依赖运行时字节等价。
 
 JSON 报告会混入 shader 宏日志，已反馈 [Calcit #2393](https://github.com/calcit-lang/calcit/issues/2393)。
