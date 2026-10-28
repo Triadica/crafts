@@ -76,7 +76,7 @@
                 step-ss $ * step ss
                 from -2000
                 to 2000
-                delta $ do $ * (- to from)
+                delta $ * (- to from)
                   cos $ * &PI $ / 78.5 180
                 base $ range size
               group ({}) (comp-axis)
@@ -596,6 +596,9 @@
                 r2 101
                 ring-step 80
                 create-ring $ fn (arm color radius thick)
+                  hint-fn $ {}
+                    :args $ [] (:: 'List 'Number) 'Number 'Number 'Number
+                    :return $ :: 'List $ :: 'List (:: 'Map 'Tag 'Dynamic)
                   let
                       va $ v-normalize $ v-cross arm normal0
                       vb $ v-normalize $ v-cross va arm
@@ -860,7 +863,7 @@
         'connect-pieces $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn connect-pieces (dots middle)
             ->
-              range $ dec $ count dots
+              range $ dec $ .len dots
               map $ fn (idx)
                 []
                   {} $ :position $ .unwrap (nth dots idx)
@@ -874,10 +877,19 @@
               :: 'List 'Number
             :return $ :: 'List $ :: 'List
               :: 'Map 'Tag $ :: 'List 'Number
+          :tests $ [] $ %{} 'TestEntry (:name |triangle-keeps-endpoints-and-center)
+            :code $ quote $ assert=
+              connect-pieces
+                [] ([] 100 0 0) ([] 0 0 100)
+                [] 0 0 0
+              [] $ []
+                {} $ :position $ [] 100 0 0
+                {} $ :position $ [] 0 0 100
+                {} $ :position $ [] 0 0 0
         'connect-pieces-dense $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn connect-pieces-dense (dots center)
             ->
-              range $ dec $ count dots
+              range $ dec $ .len dots
               map $ fn (idx)
                 let
                     pa $ .unwrap $ nth dots idx
@@ -909,6 +921,22 @@
               :: 'List 'Number
             :return $ :: 'List $ :: 'List
               :: 'List $ :: 'Map 'Tag $ :: 'List 'Number
+          :tests $ [] $ %{} 'TestEntry (:name |dense-strip-retains-400-steps-and-first-quad)
+            :code $ quote $ let
+                segments $ .unwrap $ first
+                  connect-pieces-dense
+                    [] ([] 100 2 0) ([] 0 3 100)
+                    [] 0 0 0
+              assert= (.len segments) 400
+              assert=
+                .unwrap $ first segments
+                []
+                  {} $ :position $ [] 0 2 0
+                  {} $ :position $ [] 0 3 0
+                  {} $ :position $ [] 0.25 2 0
+                  {} $ :position $ [] 0 3 0
+                  {} $ :position $ [] 0.25 2 0
+                  {} $ :position $ [] 0 3 0.25
         'dots $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def dots
             [] ([] 1 1 1) ([] 1 1 -1) ([] 1 -1 1) ([] 1 -1 -1) ([] -1 1 1) ([] -1 1 -1) ([] -1 -1 1) ([] -1 -1 -1) ([] 0 0 1.414) ([] 0 0 -1.414) ([] 0 1.414 0) ([] 0 -1.414 0) ([] 1.414 0 0) ([] -1.414 0 0)
@@ -1058,7 +1086,7 @@
         'wind-pieces $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn wind-pieces (a b)
             let
-                c $ dec $ count a
+                c $ dec $ .len a
               -> (range c)
                 map $ fn (idx)
                   []
@@ -1078,13 +1106,25 @@
               :: 'List $ :: 'List 'Number
             :return $ :: 'List $ :: 'List
               :: 'Map 'Tag $ :: 'List 'Number
+          :tests $ [] $ %{} 'TestEntry (:name |quad-keeps-six-vertex-order)
+            :code $ quote $ assert=
+              wind-pieces
+                [] ([] 0 0 0) ([] 1 0 0)
+                [] ([] 0 1 0) ([] 1 1 0)
+              [] $ []
+                {} $ :position $ [] 0 0 0
+                {} $ :position $ [] 0 1 0
+                {} $ :position $ [] 1 0 0
+                {} $ :position $ [] 0 1 0
+                {} $ :position $ [] 1 0 0
+                {} $ :position $ [] 1 1 0
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns app.comp.container
           :require (|twgl.js :as twgl)
             app.config :refer $ inline-shader hide-tabs?
             triadica.config :as t-config
             triadica.alias :refer $ object group
-            triadica.core :refer $ %nested-attribute >>
+            triadica.core :refer $ >>
             triadica.comp.line :refer $ comp-tube comp-brush
             triadica.comp.bunch :refer $ comp-strip-light
             triadica.comp.tabs :refer $ comp-tabs
@@ -1115,8 +1155,12 @@
                     -> (range 600)
                       map $ fn (idx)
                         let
-                            origin $ [] (rand-shift 0 2400) (rand-shift 0 1200) (rand-shift 0 2000)
-                          draw-umbrella origin $ v-normalize $ [] (rand-shift 80 100) (rand 100) (rand 2)
+                            origin $ decode-map-as
+                              [] (rand-shift 0 2400) (rand-shift 0 1200) (rand-shift 0 2000)
+                              :: 'List 'Number
+                          draw-umbrella origin $ v-normalize $ decode-map-as
+                            [] (rand-shift 80 100) (rand 100) (rand 2)
+                            :: 'List 'Number
                   :width 0.3
                   ; :get-uniforms $ fn () $ &js-object :time
                     &* 0.001 $ -
@@ -1172,7 +1216,7 @@
         :code $ quote $ ns app.comp.dandelions
           :require
             triadica.math :refer $ fibo-grid-range
-            triadica.core :refer $ %nested-attribute >>
+            triadica.core :refer $ >>
             triadica.comp.line :refer $ comp-tube comp-brush comp-strip-light
             memof.once :refer $ memof1-call
             triadica.comp.segments :refer $ comp-segments
@@ -1238,7 +1282,7 @@
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns app.comp.dense-tree
           :require
-            triadica.core :refer $ %nested-attribute >>
+            triadica.core :refer $ >>
             triadica.comp.line :refer $ comp-tube comp-brush comp-strip-light
             memof.once :refer $ memof1-call
             triadica.comp.segments :refer $ comp-segments fibo-grid-range
@@ -1287,7 +1331,7 @@
         :code $ quote $ ns app.comp.jakc-tree
           :require
             triadica.math :refer $ fibo-grid-range
-            triadica.core :refer $ %nested-attribute >>
+            triadica.core :refer $ >>
             triadica.comp.line :refer $ comp-tube comp-brush comp-strip-light
             memof.once :refer $ memof1-call
             triadica.comp.segments :refer $ comp-segments
@@ -1338,15 +1382,10 @@
                         c $ v-cross a b
                         a1 $ v-normalize a
                         c1 $ v-normalize c
-                      %{} Placement (:x a1) (:y c1) (:p p)
-                        :size $ pow
-                          * (js-ffi.browser/random) d-size
-                          , 2
-                  conj $ %{} Placement
-                    :x $ [] 1 0 0
-                    :y $ [] 0 1 0
-                    :p $ [] 0 0 0
-                    :size 4
+                      Placement :x a1 :y c1 :p p :size $ pow
+                        * (js-ffi.browser/random) d-size
+                        , 2
+                  conj $ Placement :x ([] 1 0 0) :y ([] 0 1 0) :p ([] 0 0 0) :size 4
               comp-segments $ {} (; :draw-mode :line-strip)
                 :fragment-shader $ inline-shader |snowflake.frag
                 :vertex-shader $ inline-shader |snowflake.vert
@@ -1517,7 +1556,7 @@
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns app.comp.snowflakes
           :require
-            triadica.core :refer $ %nested-attribute >>
+            triadica.core :refer $ >>
             triadica.comp.line :refer $ comp-tube comp-brush comp-strip-light
             memof.once :refer $ memof1-call
             triadica.comp.segments :refer $ comp-segments fibo-grid-range
@@ -1565,7 +1604,7 @@
         :code $ quote $ ns app.comp.whirlpool
           :require
             triadica.math :refer $ fibo-grid-range
-            triadica.core :refer $ %nested-attribute >>
+            triadica.core :refer $ >>
             triadica.comp.line :refer $ comp-tube comp-brush comp-strip-light
             memof.once :refer $ memof1-call
             triadica.comp.segments :refer $ comp-segments comp-segments-curves
@@ -1595,10 +1634,9 @@
       :defs $ {}
         '*store $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defref *store
-            %{} app.schema/Store
-              :states $ {}
-              :tab $ turn-tag $ .unwrap-or (get-env |tab) |3d-cycloid
-              :counter 0
+            app.schema/Store :states ({}) :tab
+              turn-tag $ .unwrap-or (get-env |tab) |3d-cycloid
+              , :counter 0
           :examples $ []
           :schema $ :: 'Ref 'app.schema/Store
         'CanvasHost $ %{} 'CodeEntry (:doc |)
@@ -1683,7 +1721,11 @@
                     .unwrap $ nth pair 0
                     :: 'List 'Tag
                   state $ .unwrap $ nth pair 1
-                Option :some $ assoc store :states $ assoc-in (:states store) ([] & cursor :data) state
+                Option :some $ assoc store :states $ decode-map-as
+                  assoc-in (:states store)
+                    concat cursor $ [] :data
+                    , state
+                  :: 'Map 'Tag 'Dynamic
               :tab $ Option :some $ assoc store :tab (decode-map-as data 'Tag)
               :inc $ Option :some $ assoc store :counter
                 inc $ :counter store
