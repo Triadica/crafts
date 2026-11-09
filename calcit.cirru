@@ -13,7 +13,7 @@
         '*triangle-counter $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defref *triangle-counter 0
           :examples $ []
-          :schema $ :: 'Ref 'Number
+          :schema $ quote $ Ref Number
         'build-connections $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn build-connections (dots)
             -> dots
@@ -22,9 +22,9 @@
               filter $ fn (ab)
                 not= (nth ab 0) (nth ab 1)
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :args $ [] $ :: 'List (:: 'List 'Number)
-            :return $ :: 'List $ :: 'List (:: 'List 'Number)
+          :schema $ quote $ Fn
+            List $ List Number
+            -> $ List $ List (List Number)
         'comp-3d-cycloid-demo $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn comp-3d-cycloid-demo ()
             let
@@ -59,12 +59,11 @@
                   {} (:size 2)
                     :position $ [] 0 40 0
                     :color $ [] 0.24 0.8 0.5
-                  fn (e d!) (d! :inc nil)
+                  fn (e d!) (d! :inc &unit)
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :args $ []
-            :features $ #{} :js-ffi
-            :return $ :: 'Map 'Tag 'Dynamic
+          :schema $ quote $ Fn
+            -> $ Map Tag Dynamic
+            :features :js-ffi
         'comp-calcite-demo $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn comp-calcite-demo ()
             let
@@ -124,10 +123,9 @@
                   ; :get-uniforms $ fn () $ js-object
                     :time $ &* 0.001 $ - (js/Date.now) start-time
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :args $ []
-            :features $ #{} :js-ffi
-            :return $ :: 'Map 'Tag 'Dynamic
+          :schema $ quote $ Fn
+            -> $ Map Tag Dynamic
+            :features :js-ffi
         'comp-christmas-tree-demo $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn comp-christmas-tree-demo ()
             comp-strip-light $ {}
@@ -164,10 +162,9 @@
               :dot-radius 1
               :gravity $ [] 0 -0.004 0
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :args $ []
-            :features $ #{} :js-ffi
-            :return $ :: 'Map 'Tag 'Dynamic
+          :schema $ quote $ Fn
+            -> $ Map Tag Dynamic
+            :features :js-ffi
         'comp-city-demo $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn comp-city-demo ()
             let
@@ -270,10 +267,9 @@
                                   {} (:position p6)
                                     :left $ .unwrap $ nth p6 1
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :args $ []
-            :features $ #{} :js-ffi
-            :return $ :: 'Map 'Tag 'Dynamic
+          :schema $ quote $ Fn
+            -> $ Map Tag Dynamic
+            :features :js-ffi
         'comp-connections-demo $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn comp-connections-demo ()
             let
@@ -298,10 +294,9 @@
                 ; :get-uniforms $ fn () $ js-object
                   :time $ &* 0.001 $ - (js/Date.now) start-time
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :args $ []
-            :features $ #{} :js-ffi
-            :return $ :: 'Map 'Tag 'Dynamic
+          :schema $ quote $ Fn
+            -> $ Map Tag Dynamic
+            :features :js-ffi
         'comp-container $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn comp-container (store)
             let
@@ -314,7 +309,7 @@
                         :position $ [] -40 0 0
                         :selected $ :tab store
                       , on-tab-change
-                    :: 'Map 'Tag 'Dynamic
+                    Map Tag Dynamic
                   group $ {}
                 match (:tab store)
                   :axis $ comp-axis
@@ -347,10 +342,9 @@
                     js/console.warn "|Unknown tab:" $ :tab store
                     comp-axis
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :args $ [] 'app.schema/Store
-            :features $ #{} :js-ffi
-            :return $ :: 'Map 'Tag 'Dynamic
+          :schema $ quote $ Fn app.schema/Store
+            -> $ Map Tag Dynamic
+            :features :js-ffi
         'comp-dianthus-demo $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn comp-dianthus-demo ()
             object $ {} (:draw-mode :triangles)
@@ -394,10 +388,9 @@
                             {} (:position p2) (:a a)
                             {} (:position p3) (:a a-next)
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :args $ []
-            :features $ #{} :js-ffi
-            :return $ :: 'Map 'Tag 'Dynamic
+          :schema $ quote $ Fn
+            -> $ Map Tag Dynamic
+            :features :js-ffi
         'comp-fibers-demo $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn comp-fibers-demo ()
             let
@@ -432,10 +425,9 @@
                 ; :get-uniforms $ fn () $ js-object
                   :time $ &* 0.001 $ - (js/Date.now) start-time
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :args $ []
-            :features $ #{} :js-ffi
-            :return $ :: 'Map 'Tag 'Dynamic
+          :schema $ quote $ Fn
+            -> $ Map Tag Dynamic
+            :features :js-ffi
         'comp-mesh-demo $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn comp-mesh-demo ()
             let
@@ -484,10 +476,9 @@
                       idx $ triangle-idx!
                     assoc di :idx $ floor $ - (/ idx 3) 3
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :args $ []
-            :features $ #{} :js-ffi
-            :return $ :: 'Map 'Tag 'Dynamic
+          :schema $ quote $ Fn
+            -> $ Map Tag Dynamic
+            :features :js-ffi
         'comp-mooncake-demo $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn comp-mooncake-demo ()
             object $ {} (:draw-mode :triangles)
@@ -516,10 +507,9 @@
                   connect-pieces down-face $ [] 0 0 0
                   connect-pieces-dense up-face $ [] 0 80 0
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :args $ []
-            :features $ #{} :js-ffi
-            :return $ :: 'Map 'Tag 'Dynamic
+          :schema $ quote $ Fn
+            -> $ Map Tag Dynamic
+            :features :js-ffi
         'comp-plastic-demo $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn comp-plastic-demo ()
             let
@@ -550,10 +540,9 @@
                         {} (:position p2) (:normal normal)
                         {} (:position p3) (:normal normal)
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :args $ []
-            :features $ #{} :js-ffi
-            :return $ :: 'Map 'Tag 'Dynamic
+          :schema $ quote $ Fn
+            -> $ Map Tag Dynamic
+            :features :js-ffi
         'comp-rings-demo $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn comp-rings-demo ()
             comp-brush $ {} (:draw-mode :triangles) (:circle-step 20) (:radius 2)
@@ -581,10 +570,9 @@
               ; :get-uniforms $ fn () $ js-object
                 :time $ &* 0.001 $ - (js/Date.now) start-time
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :args $ []
-            :features $ #{} :js-ffi
-            :return $ :: 'Map 'Tag 'Dynamic
+          :schema $ quote $ Fn
+            -> $ Map Tag Dynamic
+            :features :js-ffi
         'comp-rolling-light $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn comp-rolling-light ()
             let
@@ -596,9 +584,8 @@
                 r2 101
                 ring-step 80
                 create-ring $ fn (arm color radius thick)
-                  hint-fn $ {}
-                    :args $ [] (:: 'List 'Number) 'Number 'Number 'Number
-                    :return $ :: 'List $ :: 'List (:: 'Map 'Tag 'Dynamic)
+                  hint-fn $ Fn (List Number) Number Number Number $ ->
+                    List $ List $ Map Tag Dynamic
                   let
                       va $ v-normalize $ v-cross arm normal0
                       vb $ v-normalize $ v-cross va arm
@@ -643,10 +630,9 @@
                     -> rings $ map $ fn (arm) (create-ring arm 1 r1 2)
                     -> rings $ map $ fn (arm) (create-ring arm 0 r2 1.6)
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :args $ []
-            :features $ #{} :js-ffi
-            :return $ :: 'Map 'Tag 'Dynamic
+          :schema $ quote $ Fn
+            -> $ Map Tag Dynamic
+            :features :js-ffi
         'comp-spiral-branches-demo $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn comp-spiral-branches-demo ()
             comp-strip-light $ {}
@@ -684,10 +670,9 @@
               :dot-radius 0.8
               :gravity $ [] 0 -0.002 0
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :args $ []
-            :features $ #{} :js-ffi
-            :return $ :: 'Map 'Tag 'Dynamic
+          :schema $ quote $ Fn
+            -> $ Map Tag Dynamic
+            :features :js-ffi
         'comp-spiral-tree-demo $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn comp-spiral-tree-demo ()
             comp-strip-light $ {}
@@ -732,10 +717,9 @@
               :dot-radius 1
               :gravity $ [] 0 0 0
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :args $ []
-            :features $ #{} :js-ffi
-            :return $ :: 'Map 'Tag 'Dynamic
+          :schema $ quote $ Fn
+            -> $ Map Tag Dynamic
+            :features :js-ffi
         'comp-tube-demo $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn comp-tube-demo ()
             let
@@ -767,10 +751,9 @@
                 ; :get-uniforms $ fn () $ js-object
                   :time $ &* 0.001 $ - (js/Date.now) start-time
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :args $ []
-            :features $ #{} :js-ffi
-            :return $ :: 'Map 'Tag 'Dynamic
+          :schema $ quote $ Fn
+            -> $ Map Tag Dynamic
+            :features :js-ffi
         'comp-wistaria-demo $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn comp-wistaria-demo ()
             let
@@ -856,10 +839,9 @@
                           {} $ :position $ [] x 0 z-to
                 ; comp-axis
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :args $ []
-            :features $ #{} :js-ffi
-            :return $ :: 'Map 'Tag 'Dynamic
+          :schema $ quote $ Fn
+            -> $ Map Tag Dynamic
+            :features :js-ffi
         'connect-pieces $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn connect-pieces (dots middle)
             ->
@@ -871,12 +853,11 @@
                     nth dots $ inc idx
                   {} $ :position middle
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :args $ []
-              :: 'List $ :: 'List 'Number
-              :: 'List 'Number
-            :return $ :: 'List $ :: 'List
-              :: 'Map 'Tag $ :: 'List 'Number
+          :schema $ quote $ Fn
+            List $ List Number
+            List Number
+            -> $ List $ List
+              Map Tag $ List Number
           :tests $ [] $ %{} 'TestEntry (:name |triangle-keeps-endpoints-and-center)
             :code $ quote $ assert=
               connect-pieces
@@ -915,12 +896,11 @@
                           {} $ :position pai-next
                           {} $ :position pbi-next
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :args $ []
-              :: 'List $ :: 'List 'Number
-              :: 'List 'Number
-            :return $ :: 'List $ :: 'List
-              :: 'List $ :: 'Map 'Tag $ :: 'List 'Number
+          :schema $ quote $ Fn
+            List $ List Number
+            List Number
+            -> $ List $ List
+              List $ Map Tag $ List Number
           :tests $ [] $ %{} 'TestEntry (:name |dense-strip-retains-400-steps-and-first-quad)
             :code $ quote $ let
                 segments $ .unwrap $ first
@@ -941,7 +921,7 @@
           :code $ quote $ def dots
             [] ([] 1 1 1) ([] 1 1 -1) ([] 1 -1 1) ([] 1 -1 -1) ([] -1 1 1) ([] -1 1 -1) ([] -1 -1 1) ([] -1 -1 -1) ([] 0 0 1.414) ([] 0 0 -1.414) ([] 0 1.414 0) ([] 0 -1.414 0) ([] 1.414 0 0) ([] -1.414 0 0)
           :examples $ []
-          :schema $ :: 'List $ :: 'List 'Number
+          :schema $ quote $ List (List Number)
         'fibers-grid $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def fibers-grid
             let
@@ -967,7 +947,7 @@
                         , 2
                     * 8 8
           :examples $ []
-          :schema $ :: 'List $ :: 'List 'Number
+          :schema $ quote $ List (List Number)
         'interpolate-line-positions $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn interpolate-line-positions (a b n)
             let
@@ -981,23 +961,19 @@
                       v-scale b $ * ratio $ - n idx
                     ; :idx $ - idx $ * 0.5 n
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :args $ [] (:: 'List 'Number) (:: 'List 'Number) 'Number
-            :return $ :: 'List $ :: 'Map 'Tag (:: 'List 'Number)
+          :schema $ quote $ Fn (List Number) (List Number) Number
+            -> $ List $ Map Tag (List Number)
         'noise-2d $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def noise-2d (createNoise2D)
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'Number)
-            :args $ [] 'Number 'Number
-            :features $ #{} :js-ffi
+          :schema $ quote $ Fn Number Number (-> Number) (:features :js-ffi)
         'on-tab-change $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def on-tab-change
             fn (key d!) (d! :tab key)
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'Unit)
-            :args $ [] 'Tag $ :: 'Fn
-              {} (:return 'Unit)
-                :args $ [] 'Tag 'Tag
+          :schema $ quote $ Fn Tag
+            Fn Tag Tag $ -> Unit
+            -> Unit
         'rand-point $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn rand-point (r)
             []
@@ -1005,15 +981,14 @@
               * r $ js-ffi.browser/random
               * r $ js-ffi.browser/random
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :args $ [] 'Number
-            :features $ #{} :js-ffi
-            :return $ :: 'List 'Number
+          :schema $ quote $ Fn Number
+            -> $ List Number
+            :features :js-ffi
         'start-time $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def start-time
             :timestamp $ shared/date-now-snapshot
           :examples $ []
-          :schema $ :: 'Number
+          :schema $ quote Number
         'tab-entries $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def tab-entries
             []
@@ -1064,7 +1039,7 @@
               {} (:key :3d-cycloid)
                 :position $ [] -360 -180 0
           :examples $ []
-          :schema $ :: 'Dynamic
+          :schema $ quote Dynamic
         'triangle-idx! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn triangle-idx! ()
             let
@@ -1072,17 +1047,15 @@
               swap! *triangle-counter inc
               , v
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'Number)
-            :args $ []
+          :schema $ quote $ Fn (-> Number)
         'v-scale-xz $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn v-scale-xz (xyz r y)
             []
               &* (&list:nth xyz 0) r
               , y $ &* (&list:nth xyz 2) r
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :args $ [] (:: 'List 'Number) 'Number 'Number
-            :return $ :: 'List 'Number
+          :schema $ quote $ Fn (List Number) Number Number
+            -> $ List Number
         'wind-pieces $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn wind-pieces (a b)
             let
@@ -1100,12 +1073,11 @@
                     {} $ :position $ .unwrap
                       nth b $ inc idx
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :args $ []
-              :: 'List $ :: 'List 'Number
-              :: 'List $ :: 'List 'Number
-            :return $ :: 'List $ :: 'List
-              :: 'Map 'Tag $ :: 'List 'Number
+          :schema $ quote $ Fn
+            List $ List Number
+            List $ List Number
+            -> $ List $ List
+              Map Tag $ List Number
           :tests $ [] $ %{} 'TestEntry (:name |quad-keeps-six-vertex-order)
             :code $ quote $ assert=
               wind-pieces
@@ -1157,10 +1129,10 @@
                         let
                             origin $ decode-map-as
                               [] (rand-shift 0 2400) (rand-shift 0 1200) (rand-shift 0 2000)
-                              :: 'List 'Number
+                              List Number
                           draw-umbrella origin $ v-normalize $ decode-map-as
                             [] (rand-shift 80 100) (rand 100) (rand 2)
-                            :: 'List 'Number
+                            List Number
                   :width 0.3
                   ; :get-uniforms $ fn () $ &js-object :time
                     &* 0.001 $ -
@@ -1172,10 +1144,9 @@
                     :to $ [] 30 -400 0
                   :width 6
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :args $ []
-            :features $ #{} :js-ffi
-            :return $ :: 'Map 'Tag 'Dynamic
+          :schema $ quote $ Fn
+            -> $ Map Tag Dynamic
+            :features :js-ffi
         'draw-umbrella $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn draw-umbrella (origin p)
             let
@@ -1205,13 +1176,12 @@
                         :to $ v+ origin p1 v2
                         :color-index 1
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :args $ [] (:: 'List 'Number) (:: 'List 'Number)
-            :return $ :: 'List 'Dynamic
+          :schema $ quote $ Fn (List Number) (List Number)
+            -> $ List Dynamic
         'up $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def up ([] 0 1 0)
           :examples $ []
-          :schema $ :: 'List 'Number
+          :schema $ quote $ List Number
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns app.comp.dandelions
           :require
@@ -1241,10 +1211,9 @@
                   :timestamp $ js-ffi.shared/date-now-snapshot
                   , start-time
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :args $ []
-            :features $ #{} :js-ffi
-            :return $ :: 'Map 'Tag 'Dynamic
+          :schema $ quote $ Fn
+            -> $ Map Tag Dynamic
+            :features :js-ffi
         'make-dense-branch $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn make-dense-branch
             origin base v0 branch-ratio size total-pitch total-angle r1 level
@@ -1276,9 +1245,8 @@
                           :to $ v+ from v
                         make-dense-branch from v base 0.24 226 1.5 125 1.2 $ dec level
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :args $ [] (:: 'List 'Number) (:: 'List 'Number) (:: 'List 'Number) 'Number 'Number 'Number 'Number 'Number 'Number
-            :return $ :: 'List 'Dynamic
+          :schema $ quote $ Fn (List Number) (List Number) (List Number) Number Number Number Number Number Number
+            -> $ List Dynamic
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns app.comp.dense-tree
           :require
@@ -1318,15 +1286,14 @@
                     :timestamp $ js-ffi.shared/date-now-snapshot
                     , start-time
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :args $ []
-            :features $ #{} :js-ffi
-            :return $ :: 'Map 'Tag 'Dynamic
+          :schema $ quote $ Fn
+            -> $ Map Tag Dynamic
+            :features :js-ffi
         'start-time $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def start-time
             :timestamp $ shared/date-now-snapshot
           :examples $ []
-          :schema $ :: 'Number
+          :schema $ quote Number
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns app.comp.jakc-tree
           :require
@@ -1342,18 +1309,18 @@
       :defs $ {}
         'Placement $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstruct Placement
-            :x $ :: 'List 'Number
-            :y $ :: 'List 'Number
-            :p $ :: 'List 'Number
-            :size 'Number
+            :x $ List Number
+            :y $ List Number
+            :p $ List Number
+            :size Number
           :examples $ []
-          :schema $ :: 'StructDef
+          :schema $ quote StructDef
         'Segment2D $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstruct Segment2D
-            :from $ :: 'List 'Number
-            :to $ :: 'List 'Number
+            :from $ List Number
+            :to $ List Number
           :examples $ []
-          :schema $ :: 'StructDef
+          :schema $ quote StructDef
         'comp-snowflakes-demo $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn comp-snowflakes-demo ()
             let
@@ -1423,10 +1390,9 @@
                 :get-uniforms $ fn () $ &js-object :time
                   &* 0.08 $ - (js-ffi.shared/performance-now) start-time
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :args $ []
-            :features $ #{} :js-ffi
-            :return $ :: 'Map 'Tag 'Dynamic
+          :schema $ quote $ Fn
+            -> $ Map Tag Dynamic
+            :features :js-ffi
         'rotate-branches $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn rotate-branches (branch0)
             loop
@@ -1442,23 +1408,21 @@
                         Segment2D :from (rotate-point from) :to $ rotate-point to
                 recur (concat acc xs) xs $ dec level
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :args $ [] $ :: 'List 'app.comp.snowflakes/Segment2D
-            :return $ :: 'List 'app.comp.snowflakes/Segment2D
+          :schema $ quote $ Fn (List app.comp.snowflakes/Segment2D)
+            -> $ List app.comp.snowflakes/Segment2D
         'rotate-point $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn rotate-point (point)
             let[] (x y) point $ match
               qc/&c* (qc/complex x y) snowflake-rotation
               (:complex real imaginary) ([] real imaginary)
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :args $ [] $ :: 'List 'Number
-            :return $ :: 'List 'Number
+          :schema $ quote $ Fn (List Number)
+            -> $ List Number
         'snowflake-rotation $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def snowflake-rotation
             qc/complex 0.5 $ * 0.5 sqrt3
           :examples $ []
-          :schema $ :: 'quaternion.complex/Complex
+          :schema $ quote quaternion.complex/Complex
         'snowflake-shape $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def snowflake-shape
             let
@@ -1475,7 +1439,7 @@
               ; js/console.log branches
               , branches
           :examples $ []
-          :schema $ :: 'List 'app.comp.snowflakes/Segment2D
+          :schema $ quote $ List app.comp.snowflakes/Segment2D
         'snowflake-shape-bare $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def snowflake-shape-bare
             let
@@ -1484,7 +1448,7 @@
               ; js/console.log branches
               , branches
           :examples $ []
-          :schema $ :: 'List 'app.comp.snowflakes/Segment2D
+          :schema $ quote $ List app.comp.snowflakes/Segment2D
         'snowflake-shape-branch $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def snowflake-shape-branch
             let
@@ -1495,7 +1459,7 @@
               ; js/console.log branches
               , branches
           :examples $ []
-          :schema $ :: 'List 'app.comp.snowflakes/Segment2D
+          :schema $ quote $ List app.comp.snowflakes/Segment2D
         'snowflake-shape-hairy $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def snowflake-shape-hairy
             let
@@ -1511,7 +1475,7 @@
               ; js/console.log branches
               , branches
           :examples $ []
-          :schema $ :: 'List 'app.comp.snowflakes/Segment2D
+          :schema $ quote $ List app.comp.snowflakes/Segment2D
         'snowflake-shape-ring $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def snowflake-shape-ring
             let
@@ -1520,7 +1484,7 @@
               ; js/console.log branches
               , branches
           :examples $ []
-          :schema $ :: 'List 'app.comp.snowflakes/Segment2D
+          :schema $ quote $ List app.comp.snowflakes/Segment2D
         'snowflake-shape-sparse $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def snowflake-shape-sparse
             let
@@ -1532,7 +1496,7 @@
               ; js/console.log branches
               , branches
           :examples $ []
-          :schema $ :: 'List 'app.comp.snowflakes/Segment2D
+          :schema $ quote $ List app.comp.snowflakes/Segment2D
         'snowflake-shape-star $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def snowflake-shape-star
             let
@@ -1544,15 +1508,15 @@
               ; js/console.log branches
               , branches
           :examples $ []
-          :schema $ :: 'List 'app.comp.snowflakes/Segment2D
+          :schema $ quote $ List app.comp.snowflakes/Segment2D
         'sqrt3 $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def sqrt3 (sqrt 3)
           :examples $ []
-          :schema $ :: 'Number
+          :schema $ quote Number
         'start-time $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def start-time (shared/performance-now)
           :examples $ []
-          :schema $ :: 'Number
+          :schema $ quote Number
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns app.comp.snowflakes
           :require
@@ -1591,15 +1555,14 @@
               :get-uniforms $ fn () $ &js-object :time
                 &* 0.01 $ - start $ :timestamp (js-ffi.shared/date-now-snapshot)
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :args $ []
-            :features $ #{} :js-ffi
-            :return $ :: 'Map 'Tag 'Dynamic
+          :schema $ quote $ Fn
+            -> $ Map Tag Dynamic
+            :features :js-ffi
         'start $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def start
             :timestamp $ shared/date-now-snapshot
           :examples $ []
-          :schema $ :: 'Number
+          :schema $ quote Number
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns app.comp.whirlpool
           :require
@@ -1619,15 +1582,14 @@
           :code $ quote $ def hide-tabs?
             = |true $ .unwrap-or (get-env |hide-tabs) |false
           :examples $ []
-          :schema $ :: 'Bool
+          :schema $ quote Bool
         'inline-shader $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defmacro inline-shader (file) (println "|inline shader file:" file)
             read-file $ str |shaders/ file
           :examples $ []
-          :schema $ :: 'Macro $ {}
-            :capabilities $ #{} :fs-read :log
-            :expansion $ :: 'Expr 'String
-            :required $ [] $ :: 'Expr 'String
+          :schema $ quote $ Macro (Expr String)
+            -> $ Expr String
+            :capabilities :fs-read :log
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns app.config
     'app.main $ %{} 'FileEntry
@@ -1638,31 +1600,48 @@
               turn-tag $ .unwrap-or (get-env |tab) |3d-cycloid
               , :counter 0
           :examples $ []
-          :schema $ :: 'Ref 'app.schema/Store
+          :schema $ quote $ Ref app.schema/Store
         'CanvasHost $ %{} 'CodeEntry (:doc |)
           :code $ quote $ deftrait CanvasHost
-            .get-context $ :: 'Fn $ {}
-              :args $ [] 'app.main/CanvasHost 'String 'JsObject
-              :return $ :: 'JsNullish 'JsObject
+            .get-context $ Fn app.main/CanvasHost String JsObject $ -> (JsNullish JsObject)
           :examples $ []
           :ffi $ {} (:backend :js) (:kind :external-object) (:target :browser)
-          :schema $ :: 'Trait
+          :schema $ quote Trait
         'canvas $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def canvas
             .unwrap $ js-ffi.browser/query-selector |canvas
           :examples $ []
-          :schema $ :: 'js-ffi.browser/DomElementHost
+          :schema $ quote js-ffi.browser/DomElementHost
+        'decode-op $ %{} 'CodeEntry
+          :doc "|Validate the tagged events received from the Space renderer."
+          :code $ quote $ defn decode-op (op data)
+            match (try-decode-map-as op 'Tag)
+              (:ok tag)
+                match tag
+                  :states $ let
+                      pair $ decode-map-as data $ List Dynamic
+                      cursor $ decode-map-as
+                        .unwrap $ nth pair 0
+                        List Tag
+                    Option :some $ app.schema/Op :states cursor $ .unwrap (nth pair 1)
+                  :tab $ Option :some $ app.schema/Op :tab (decode-map-as data 'Tag)
+                  :inc $ Option :some $ app.schema/Op :inc
+                  _ $ Option :none
+              (:err _) (Option :none)
+          :examples $ []
+          :schema $ quote $ Fn Operation Payload
+            -> $ Option app.schema/Op
+            :generics Operation Payload
         'dispatch! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn dispatch! (op data)
             when dev? $ js/console.log |Dispatch: op data
-            match (update-store @*store op data)
-              (:some next) (reset! *store next)
+            match (decode-op op data)
+              (:some action)
+                reset! *store $ update-store @*store action
               (:none) (js/console.warn "|unknown op" op)
             , &unit
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'Unit)
-            :args $ [] 'Dynamic 'Dynamic
-            :features $ #{} :js-ffi
+          :schema $ quote $ Fn Operation Payload (-> Unit) (:generics Operation Payload) (:features :js-ffi)
         'main! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn main! ()
             if dev? $ load-console-formatter!
@@ -1684,9 +1663,7 @@
             ; flipped js/setInterval 4000 $ fn () $ dispatch! :inc nil
             , &unit
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'Unit)
-            :args $ []
-            :features $ #{} :js-ffi
+          :schema $ quote $ Fn (-> Unit) (:features :js-ffi)
         'reload! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn reload! ()
             if (nil? build-errors)
@@ -1700,40 +1677,28 @@
               hud! |error build-errors
             , &unit
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'Unit)
-            :args $ []
-            :features $ #{} :js-ffi
+          :schema $ quote $ Fn (-> Unit) (:features :js-ffi)
         'render-app! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn render-app! () (reset! *triangle-counter 0)
             load-objects! (comp-container @*store) dispatch!
             paint-canvas!
             , &unit
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'Unit)
-            :args $ []
-            :features $ #{} :js-ffi
+          :schema $ quote $ Fn (-> Unit) (:features :js-ffi)
         'update-store $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defn update-store (store op data)
+          :code $ quote $ defn update-store (store op)
             match op
-              :states $ let
-                  pair $ decode-map-as data $ :: 'List 'Dynamic
-                  cursor $ decode-map-as
-                    .unwrap $ nth pair 0
-                    :: 'List 'Tag
-                  state $ .unwrap $ nth pair 1
-                Option :some $ assoc store :states $ decode-map-as
+              (:states cursor state)
+                assoc store :states $ decode-map-as
                   assoc-in (:states store)
                     concat cursor $ [] :data
                     , state
-                  :: 'Map 'Tag 'Dynamic
-              :tab $ Option :some $ assoc store :tab (decode-map-as data 'Tag)
-              :inc $ Option :some $ assoc store :counter
-                inc $ :counter store
-              _ $ Option :none
+                  Map Tag Dynamic
+              (:tab tab) (assoc store :tab tab)
+              (:inc)
+                assoc store :counter $ inc $ :counter store
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :args $ [] 'app.schema/Store 'Dynamic 'Dynamic
-            :return $ :: 'Option 'app.schema/Store
+          :schema $ quote $ Fn app.schema/Store app.schema/Op (-> app.schema/Store)
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns app.main
           :require (|./calcit.build-errors :default build-errors) (|bottom-tip :default hud!)
@@ -1745,13 +1710,20 @@
             app.comp.container :refer $ comp-container *triangle-counter
             triadica.comp.tabs :refer $ comp-tabs
     'app.schema $ %{} 'FileEntry
-      :defs $ {} $ 'Store
-        %{} 'CodeEntry (:doc |)
-          :code $ quote $ defstruct Store
-            :states $ :: 'Map 'Tag 'Dynamic
-            :tab 'Tag
-            :counter 'Number
+      :defs $ {}
+        'Op $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defenum Op
+            :states (List Tag) Dynamic
+            :tab Tag
+            :inc
           :examples $ []
-          :schema $ :: 'StructDef
+          :schema $ quote EnumDef
+        'Store $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstruct Store
+            :states $ Map Tag Dynamic
+            :tab Tag
+            :counter Number
+          :examples $ []
+          :schema $ quote StructDef
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns app.schema

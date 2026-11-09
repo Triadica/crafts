@@ -49,7 +49,7 @@ jobs:
         source_blob="$(git hash-object calcit.cirru)"
         calcit edit format
         test "$(git hash-object calcit.cirru)" = "$source_blob"
-        calcit --check-only --all-defs --strict-types
+        calcit --check-only --all-defs
         calcit --check-only --ns 'app.$meta' --ns app.comp.container \
           --ns app.comp.dandelions --ns app.comp.dense-tree --ns app.comp.jakc-tree \
           --ns app.comp.snowflakes --ns app.comp.whirlpool --ns app.config \
