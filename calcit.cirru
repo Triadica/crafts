@@ -1154,12 +1154,17 @@
                 h-direction $ v-cross rot-direction p
                 p0 $ v-scale p 14
                 p1 $ v-scale p 120
-              []
-                {} (:from origin)
-                  :to $ v+ origin p1
-                  :color-index 0
+              conj
+                assert-type
+                  [] $ assert-type
+                    {} (:from origin)
+                      :to $ v+ origin p1
+                      :color-index 0
+                    Map Tag app.schema/SegmentField
+                  List app.schema/SegmentTree
                 -> (range 60)
                   map $ fn (idx0)
+                    hint-fn $ Fn Number $ -> app.schema/SegmentTree
                     let
                         idx $ + idx0 40
                         spin $ * idx 0.4
@@ -1171,13 +1176,15 @@
                         v2 $ v+
                           v-scale p $ * r $ sin pitch
                           v-scale v $ cos pitch
-                      {}
-                        :from $ v+ origin p1 $ v-scale v2 0.01
-                        :to $ v+ origin p1 v2
-                        :color-index 1
+                      assert-type
+                        {}
+                          :from $ v+ origin p1 $ v-scale v2 0.01
+                          :to $ v+ origin p1 v2
+                          :color-index 1
+                        Map Tag app.schema/SegmentField
           :examples $ []
           :schema $ quote $ Fn (List Number) (List Number)
-            -> $ List Dynamic
+            -> $ List app.schema/SegmentTree
         'up $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def up ([] 0 1 0)
           :examples $ []
@@ -1223,11 +1230,16 @@
                 branch-length $ * branch-ratio base-length
                 v0-direction $ v-normalize v0
                 h-direction $ v-normalize $ v-cross v0-direction base
-              []
-                {} (:from origin)
-                  :to $ v+ origin base
+              conj
+                assert-type
+                  [] $ assert-type
+                    {} (:from origin)
+                      :to $ v+ origin base
+                    Map Tag app.schema/SegmentField
+                  List app.schema/SegmentTree
                 -> (range size)
                   map $ fn (idx)
+                    hint-fn $ Fn Number $ -> app.schema/SegmentTree
                     let
                         ratio $ + 0.2 $ * 0.8 (&/ idx size)
                         ratio-inv $ &- 1 ratio
@@ -1241,12 +1253,14 @@
                           v-scale base-direction $ * branch-length $ cos pitch
                           v-scale rot-direction $ * branch-length $ sin pitch
                       if (<= level 0)
-                        {} (:from from)
-                          :to $ v+ from v
+                        assert-type
+                          {} (:from from)
+                            :to $ v+ from v
+                          Map Tag app.schema/SegmentField
                         make-dense-branch from v base 0.24 226 1.5 125 1.2 $ dec level
           :examples $ []
           :schema $ quote $ Fn (List Number) (List Number) (List Number) Number Number Number Number Number Number
-            -> $ List Dynamic
+            -> $ List app.schema/SegmentTree
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns app.comp.dense-tree
           :require
@@ -1718,6 +1732,14 @@
             :inc
           :examples $ []
           :schema $ quote EnumDef
+        'SegmentField $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defunion SegmentField Number (List Number)
+          :examples $ []
+          :schema $ quote UnionDef
+        'SegmentTree $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defunion SegmentTree (Map Tag app.schema/SegmentField) (List SegmentTree)
+          :examples $ []
+          :schema $ quote UnionDef
         'Store $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstruct Store
             :states $ Map Tag Dynamic
