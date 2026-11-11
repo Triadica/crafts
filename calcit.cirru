@@ -17,6 +17,7 @@
         'RollingVertexAttribute $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defunion RollingVertexAttribute Number (List Number)
           :examples $ []
+          :schema $ quote UnionDef
         'TabField $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defunion TabField Tag (List Number)
           :examples $ []
