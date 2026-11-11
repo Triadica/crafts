@@ -14,6 +14,9 @@
           :code $ quote $ defref *triangle-counter 0
           :examples $ []
           :schema $ quote $ Ref Number
+        'RollingVertexAttribute $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defunion RollingVertexAttribute Number (List Number)
+          :examples $ []
         'build-connections $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn build-connections (dots)
             -> dots
@@ -585,7 +588,7 @@
                 ring-step 80
                 create-ring $ fn (arm color radius thick)
                   hint-fn $ Fn (List Number) Number Number Number $ ->
-                    List $ List $ Map Tag Dynamic
+                    List $ List $ Map Tag RollingVertexAttribute
                   let
                       va $ v-normalize $ v-cross arm normal0
                       vb $ v-normalize $ v-cross va arm
@@ -615,13 +618,7 @@
                                 v-scale va $ * radius $ cos angle-next
                                 v-scale vb $ * radius $ sin angle-next
                               v-scale arm $ negate thick
-                          []
-                            {} (:position p0) (:color_v color)
-                            {} (:position p1) (:color_v color)
-                            {} (:position p2) (:color_v color)
-                            {} (:position p1) (:color_v color)
-                            {} (:position p2) (:color_v color)
-                            {} (:position p3) (:color_v color)
+                          [] (rolling-vertex p0 color) (rolling-vertex p1 color) (rolling-vertex p2 color) (rolling-vertex p1 color) (rolling-vertex p2 color) (rolling-vertex p3 color)
               group ({})
                 object $ {} (:draw-mode :triangles)
                   :vertex-shader $ inline-shader |rolling-light.vert
@@ -922,6 +919,10 @@
             [] ([] 1 1 1) ([] 1 1 -1) ([] 1 -1 1) ([] 1 -1 -1) ([] -1 1 1) ([] -1 1 -1) ([] -1 -1 1) ([] -1 -1 -1) ([] 0 0 1.414) ([] 0 0 -1.414) ([] 0 1.414 0) ([] 0 -1.414 0) ([] 1.414 0 0) ([] -1.414 0 0)
           :examples $ []
           :schema $ quote $ List (List Number)
+        'empty-rolling-vertex $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ def empty-rolling-vertex ({})
+          :examples $ []
+          :schema $ quote $ Map Tag RollingVertexAttribute
         'fibers-grid $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def fibers-grid
             let
@@ -984,6 +985,12 @@
           :schema $ quote $ Fn Number
             -> $ List Number
             :features :js-ffi
+        'rolling-vertex $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defn rolling-vertex (position color)
+            .assoc (.assoc empty-rolling-vertex :position position) :color_v color
+          :examples $ []
+          :schema $ quote $ Fn (List Number) Number
+            -> $ Map Tag RollingVertexAttribute
         'start-time $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def start-time
             :timestamp $ shared/date-now-snapshot
@@ -1422,8 +1429,8 @@
                         Segment2D :from (rotate-point from) :to $ rotate-point to
                 recur (concat acc xs) xs $ dec level
           :examples $ []
-          :schema $ quote $ Fn (List app.comp.snowflakes/Segment2D)
-            -> $ List app.comp.snowflakes/Segment2D
+          :schema $ quote $ Fn (List Segment2D)
+            -> $ List Segment2D
         'rotate-point $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn rotate-point (point)
             let[] (x y) point $ match
@@ -1436,7 +1443,7 @@
           :code $ quote $ def snowflake-rotation
             qc/complex 0.5 $ * 0.5 sqrt3
           :examples $ []
-          :schema $ quote quaternion.complex/Complex
+          :schema $ quote qc/Complex
         'snowflake-shape $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def snowflake-shape
             let
@@ -1453,7 +1460,7 @@
               ; js/console.log branches
               , branches
           :examples $ []
-          :schema $ quote $ List app.comp.snowflakes/Segment2D
+          :schema $ quote $ List Segment2D
         'snowflake-shape-bare $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def snowflake-shape-bare
             let
@@ -1462,7 +1469,7 @@
               ; js/console.log branches
               , branches
           :examples $ []
-          :schema $ quote $ List app.comp.snowflakes/Segment2D
+          :schema $ quote $ List Segment2D
         'snowflake-shape-branch $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def snowflake-shape-branch
             let
@@ -1473,7 +1480,7 @@
               ; js/console.log branches
               , branches
           :examples $ []
-          :schema $ quote $ List app.comp.snowflakes/Segment2D
+          :schema $ quote $ List Segment2D
         'snowflake-shape-hairy $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def snowflake-shape-hairy
             let
@@ -1489,7 +1496,7 @@
               ; js/console.log branches
               , branches
           :examples $ []
-          :schema $ quote $ List app.comp.snowflakes/Segment2D
+          :schema $ quote $ List Segment2D
         'snowflake-shape-ring $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def snowflake-shape-ring
             let
@@ -1498,7 +1505,7 @@
               ; js/console.log branches
               , branches
           :examples $ []
-          :schema $ quote $ List app.comp.snowflakes/Segment2D
+          :schema $ quote $ List Segment2D
         'snowflake-shape-sparse $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def snowflake-shape-sparse
             let
@@ -1510,7 +1517,7 @@
               ; js/console.log branches
               , branches
           :examples $ []
-          :schema $ quote $ List app.comp.snowflakes/Segment2D
+          :schema $ quote $ List Segment2D
         'snowflake-shape-star $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def snowflake-shape-star
             let
@@ -1522,7 +1529,7 @@
               ; js/console.log branches
               , branches
           :examples $ []
-          :schema $ quote $ List app.comp.snowflakes/Segment2D
+          :schema $ quote $ List Segment2D
         'sqrt3 $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def sqrt3 (sqrt 3)
           :examples $ []
@@ -1637,11 +1644,11 @@
                       cursor $ decode-map-as
                         .unwrap $ nth pair 0
                         List Tag
-                    Option :some $ app.schema/Op :states cursor $ .unwrap (nth pair 1)
-                  :tab $ Option :some $ app.schema/Op :tab (decode-map-as data 'Tag)
-                  :inc $ Option :some $ app.schema/Op :inc
-                  _ $ Option :none
-              (:err _) (Option :none)
+                    Some $ app.schema/Op :states cursor $ .unwrap (nth pair 1)
+                  :tab $ Some $ app.schema/Op :tab (decode-map-as data 'Tag)
+                  :inc $ Some $ app.schema/Op :inc
+                  _ None
+              (:err _) None
           :examples $ []
           :schema $ quote $ Fn Operation Payload
             -> $ Option app.schema/Op
@@ -1666,7 +1673,7 @@
                 host $ js-cast canvas 'app.main/CanvasHost
                 context $ host .get-context |webgl $ &js-object :antialias true
               if (js-present? context)
-                reset! *gl-context $ Option :some context
+                reset! *gl-context $ Some context
                 raise |WebGL-context-unavailable
             render-app!
             render-control!
