@@ -4,5 +4,5 @@
     |Triadica/triadica-space |0.0.49
     |Respo/respo.calcit |0.19.5
     |calcit-lang/quaternion |0.2.23
-    |calcit-lang/memof |0.0.49
+    |calcit-lang/memof |0.0.50
     |calcit-lang/js-ffi |0.2.13

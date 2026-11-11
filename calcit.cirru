@@ -17,6 +17,10 @@
         'RollingVertexAttribute $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defunion RollingVertexAttribute Number (List Number)
           :examples $ []
+        'TabField $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defunion TabField Tag (List Number)
+          :examples $ []
+          :schema $ quote UnionDef
         'build-connections $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn build-connections (dots)
             -> dots
@@ -306,13 +310,7 @@
                 states $ :states store
               group ({})
                 if (not hide-tabs?)
-                  decode-map-as
-                    memof1-call comp-tabs tab-entries
-                      {}
-                        :position $ [] -40 0 0
-                        :selected $ :tab store
-                      , on-tab-change
-                    Map Tag Dynamic
+                  memof1-call-unary comp-demo-tabs $ :tab store
                   group $ {}
                 match (:tab store)
                   :axis $ comp-axis
@@ -346,6 +344,17 @@
                     comp-axis
           :examples $ []
           :schema $ quote $ Fn app.schema/Store
+            -> $ Map Tag Dynamic
+            :features :js-ffi
+        'comp-demo-tabs $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defn comp-demo-tabs (selected)
+            comp-tabs tab-entries
+              {}
+                :position $ [] -40 0 0
+                :selected selected
+              , on-tab-change
+          :examples $ []
+          :schema $ quote $ Fn Tag
             -> $ Map Tag Dynamic
             :features :js-ffi
         'comp-dianthus-demo $ %{} 'CodeEntry (:doc |)
@@ -1046,7 +1055,7 @@
               {} (:key :3d-cycloid)
                 :position $ [] -360 -180 0
           :examples $ []
-          :schema $ quote Dynamic
+          :schema $ quote $ List (Map Tag TabField)
         'triangle-idx! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn triangle-idx! ()
             let
@@ -1110,7 +1119,7 @@
             triadica.comp.axis :refer $ comp-axis
             triadica.comp.drag-point :refer $ comp-button
             |simplex-noise :refer $ createNoise2D
-            memof.once :refer $ memof1-call
+            memof.once :refer $ memof1-call-unary
             app.comp.jakc-tree :refer $ comp-jakc-tree
             triadica.comp.segments :refer $ comp-segments comp-segments-curves
             app.comp.snowflakes :refer $ comp-snowflakes-demo
