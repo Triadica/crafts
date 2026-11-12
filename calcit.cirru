@@ -17,6 +17,7 @@
         'RollingVertexAttribute $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defunion RollingVertexAttribute Number (List Number)
           :examples $ []
+          :schema $ quote UnionDef
         'TabField $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defunion TabField Tag (List Number)
           :examples $ []
@@ -306,42 +307,40 @@
             :features :js-ffi
         'comp-container $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn comp-container (store)
-            let
-                states $ :states store
-              group ({})
-                if (not hide-tabs?)
-                  memof1-call-unary comp-demo-tabs $ :tab store
-                  group $ {}
-                match (:tab store)
-                  :axis $ comp-axis
-                  :wave $ object $ {} (:draw-mode :line-strip)
-                    :vertex-shader $ inline-shader |wave.vert
-                    :fragment-shader $ inline-shader |wave.frag
-                    :attributes $ {} $ :idx (range 100000)
-                  :tube $ comp-tube-demo
-                  :mesh $ comp-mesh-demo
-                  :fibers $ comp-fibers-demo
-                  :connections $ comp-connections-demo
-                  :rolling-light $ comp-rolling-light
-                  :plastic $ comp-plastic-demo
-                  :rings $ comp-rings-demo
-                  :mooncake $ comp-mooncake-demo
-                  :calcite $ comp-calcite-demo
-                  :city $ comp-city-demo
-                  :dianthus $ comp-dianthus-demo
-                  :christmas-tree $ comp-christmas-tree-demo
-                  :wistaria $ comp-wistaria-demo
-                  :spiral-tree $ comp-spiral-tree-demo
-                  :spiral-branches $ comp-spiral-branches-demo
-                  :jakc-tree $ comp-jakc-tree
-                  :snowflakes $ comp-snowflakes-demo
-                  :dense-tree $ comp-dense-tree-demo
-                  :dandelions $ comp-dandelions-demo
-                  :whirlpool $ comp-whirlpool
-                  :3d-cycloid $ comp-3d-cycloid-demo
-                  _ $ do
-                    js/console.warn "|Unknown tab:" $ :tab store
-                    comp-axis
+            group ({})
+              if (not hide-tabs?)
+                memof1-call-unary comp-demo-tabs $ :tab store
+                group $ {}
+              match (:tab store)
+                :axis $ comp-axis
+                :wave $ object $ {} (:draw-mode :line-strip)
+                  :vertex-shader $ inline-shader |wave.vert
+                  :fragment-shader $ inline-shader |wave.frag
+                  :attributes $ {} $ :idx (range 100000)
+                :tube $ comp-tube-demo
+                :mesh $ comp-mesh-demo
+                :fibers $ comp-fibers-demo
+                :connections $ comp-connections-demo
+                :rolling-light $ comp-rolling-light
+                :plastic $ comp-plastic-demo
+                :rings $ comp-rings-demo
+                :mooncake $ comp-mooncake-demo
+                :calcite $ comp-calcite-demo
+                :city $ comp-city-demo
+                :dianthus $ comp-dianthus-demo
+                :christmas-tree $ comp-christmas-tree-demo
+                :wistaria $ comp-wistaria-demo
+                :spiral-tree $ comp-spiral-tree-demo
+                :spiral-branches $ comp-spiral-branches-demo
+                :jakc-tree $ comp-jakc-tree
+                :snowflakes $ comp-snowflakes-demo
+                :dense-tree $ comp-dense-tree-demo
+                :dandelions $ comp-dandelions-demo
+                :whirlpool $ comp-whirlpool
+                :3d-cycloid $ comp-3d-cycloid-demo
+                _ $ do
+                  js/console.warn "|Unknown tab:" $ :tab store
+                  comp-axis
           :examples $ []
           :schema $ quote $ Fn app.schema/Store
             -> $ Map Tag Dynamic
@@ -1626,7 +1625,7 @@
       :defs $ {}
         '*store $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defref *store
-            app.schema/Store :states ({}) :tab
+            app.schema/Store :tab
               turn-tag $ .unwrap-or (get-env |tab) |3d-cycloid
               , :counter 0
           :examples $ []
@@ -1648,12 +1647,6 @@
             match (try-decode-map-as op 'Tag)
               (:ok tag)
                 match tag
-                  :states $ let
-                      pair $ decode-map-as data $ List Dynamic
-                      cursor $ decode-map-as
-                        .unwrap $ nth pair 0
-                        List Tag
-                    Some $ app.schema/Op :states cursor $ .unwrap (nth pair 1)
                   :tab $ Some $ app.schema/Op :tab (decode-map-as data 'Tag)
                   :inc $ Some $ app.schema/Op :inc
                   _ None
@@ -1662,6 +1655,14 @@
           :schema $ quote $ Fn Operation Payload
             -> $ Option app.schema/Op
             :generics Operation Payload
+          :tests $ [] $ %{} 'TestEntry (:name |keeps-tab-selection-and-click-redraw)
+            :code $ quote $ let
+                initial $ app.schema/Store :tab :axis :counter 0
+                selected $ update-store initial $ .unwrap (decode-op :tab :wave)
+                clicked $ update-store selected $ .unwrap (decode-op :inc &unit)
+              assert= :wave $ :tab clicked
+              assert= 1 $ :counter clicked
+              assert= None $ decode-op :states $ [] ([] :unused) ({})
         'dispatch! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn dispatch! (op data)
             when dev? $ js/console.log |Dispatch: op data
@@ -1718,12 +1719,6 @@
         'update-store $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn update-store (store op)
             match op
-              (:states cursor state)
-                assoc store :states $ decode-map-as
-                  assoc-in (:states store)
-                    concat cursor $ [] :data
-                    , state
-                  Map Tag Dynamic
               (:tab tab) (assoc store :tab tab)
               (:inc)
                 assoc store :counter $ inc $ :counter store
@@ -1735,17 +1730,14 @@
             triadica.config :refer $ dev? dpr
             |twgl.js :as twgl
             touch-control.core :refer $ render-control! start-control-loop! replace-control-loop!
-            triadica.core :refer $ on-control-event load-objects! paint-canvas! setup-mouse-events! reset-canvas-size! update-states
+            triadica.core :refer $ on-control-event load-objects! paint-canvas! setup-mouse-events! reset-canvas-size!
             triadica.global :refer $ *gl-context
             app.comp.container :refer $ comp-container *triangle-counter
             triadica.comp.tabs :refer $ comp-tabs
     'app.schema $ %{} 'FileEntry
       :defs $ {}
         'Op $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defenum Op
-            :states (List Tag) Dynamic
-            :tab Tag
-            :inc
+          :code $ quote $ defenum Op (:tab Tag) (:inc)
           :examples $ []
           :schema $ quote EnumDef
         'SegmentField $ %{} 'CodeEntry (:doc |)
@@ -1757,10 +1749,7 @@
           :examples $ []
           :schema $ quote UnionDef
         'Store $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defstruct Store
-            :states $ Map Tag Dynamic
-            :tab Tag
-            :counter Number
+          :code $ quote $ defstruct Store (:tab Tag) (:counter Number)
           :examples $ []
           :schema $ quote StructDef
       :ns $ %{} 'NsEntry (:doc |)

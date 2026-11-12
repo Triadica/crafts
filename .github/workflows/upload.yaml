@@ -55,9 +55,7 @@ jobs:
           --ns app.comp.snowflakes --ns app.comp.whirlpool --ns app.config \
           --ns app.main --ns app.schema
         calcit fix --workflow strict --verify
-        calcit test app.comp.container/connect-pieces --require-match
-        calcit test app.comp.container/connect-pieces-dense --require-match
-        calcit test app.comp.container/wind-pieces --require-match
+        calcit test --require-match --summary-only
 
     - name: Select frontend CDN path
       id: asset-path
