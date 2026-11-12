@@ -344,7 +344,7 @@
           :examples $ []
           :schema $ quote $ Fn app.schema/Store
             -> $ Map Tag Dynamic
-            :features :js-ffi
+            :features :js-ffi :state
         'comp-demo-tabs $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn comp-demo-tabs (selected)
             comp-tabs tab-entries
@@ -489,7 +489,7 @@
           :examples $ []
           :schema $ quote $ Fn
             -> $ Map Tag Dynamic
-            :features :js-ffi
+            :features :js-ffi :state
         'comp-mooncake-demo $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn comp-mooncake-demo ()
             object $ {} (:draw-mode :triangles)
@@ -861,7 +861,9 @@
           :schema $ quote $ Fn
             List $ List Number
             List Number
-            -> $ List $ List
+            -> $ List $ Tuple
+              Map Tag $ List Number
+              Map Tag $ List Number
               Map Tag $ List Number
           :tests $ [] $ %{} 'TestEntry (:name |triangle-keeps-endpoints-and-center)
             :code $ quote $ assert=
@@ -1062,7 +1064,7 @@
               swap! *triangle-counter inc
               , v
           :examples $ []
-          :schema $ quote $ Fn (-> Number)
+          :schema $ quote $ Fn (-> Number) (:features :state)
         'v-scale-xz $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn v-scale-xz (xyz r y)
             []
@@ -1091,7 +1093,12 @@
           :schema $ quote $ Fn
             List $ List Number
             List $ List Number
-            -> $ List $ List
+            -> $ List $ Tuple
+              Map Tag $ List Number
+              Map Tag $ List Number
+              Map Tag $ List Number
+              Map Tag $ List Number
+              Map Tag $ List Number
               Map Tag $ List Number
           :tests $ [] $ %{} 'TestEntry (:name |quad-keeps-six-vertex-order)
             :code $ quote $ assert=
@@ -1672,7 +1679,7 @@
               (:none) (js/console.warn "|unknown op" op)
             , &unit
           :examples $ []
-          :schema $ quote $ Fn Operation Payload (-> Unit) (:generics Operation Payload) (:features :js-ffi)
+          :schema $ quote $ Fn Operation Payload (-> Unit) (:generics Operation Payload) (:features :js-ffi :state)
         'main! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn main! ()
             if dev? $ load-console-formatter!
@@ -1694,7 +1701,7 @@
             ; flipped js/setInterval 4000 $ fn () $ dispatch! :inc nil
             , &unit
           :examples $ []
-          :schema $ quote $ Fn (-> Unit) (:features :js-ffi)
+          :schema $ quote $ Fn (-> Unit) (:features :js-ffi :state)
         'reload! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn reload! ()
             if (nil? build-errors)
@@ -1708,14 +1715,14 @@
               hud! |error build-errors
             , &unit
           :examples $ []
-          :schema $ quote $ Fn (-> Unit) (:features :js-ffi)
+          :schema $ quote $ Fn (-> Unit) (:features :js-ffi :state)
         'render-app! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn render-app! () (reset! *triangle-counter 0)
             load-objects! (comp-container @*store) dispatch!
             paint-canvas!
             , &unit
           :examples $ []
-          :schema $ quote $ Fn (-> Unit) (:features :js-ffi)
+          :schema $ quote $ Fn (-> Unit) (:features :js-ffi :state)
         'update-store $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn update-store (store op)
             match op
