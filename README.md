@@ -2,9 +2,9 @@
 
 - Demo https://r.tiye.me/Triadica/crafts/
 
-### Calcit 0.41.1 使用说明
+### Calcit 0.42.0 使用说明
 
-升级请配套使用正式 Calcit 和 `@calcit/procs` 0.41.1 及 Space 0.0.49，
+升级请配套使用正式 Calcit 和 `@calcit/procs` 0.42.0 及 Space 0.0.49，
 重装依赖后重新生成 JS。场景切换、计数和旧游标事件沿用原格式。
 更新器使用具名 `Op`，游标状态仍允许控件存入自己的数据。
 
@@ -19,7 +19,7 @@ Space 0.0.46 / js-ffi 0.2.7，旧版 canvas 合同阻塞已在本项目实际页
 
 https://github.com/Triadica/triadica-workflow
 
-源码使用 `calcit.cirru` 与 `deps.cirru`，Calcit / `@calcit/procs` 固定为正式版 `0.41.1`。使用 Node 24、Yarn 4.18，依次运行 `caps --strict --ci`、`yarn install --immutable`、`caps verify --toolchain`、`calcit --check-only --all-defs`、`calcit fix --workflow strict --verify` 和 `calcit js`，再运行 `yarn vite`。生成的 `js-out/` 不进入仓库，不恢复 compact.cirru/package.cirru。
+源码使用 `calcit.cirru` 与 `deps.cirru`，Calcit / `@calcit/procs` 固定为正式版 `0.42.0`。使用 Node 24、Yarn 4.18，依次运行 `caps --strict --ci`、`yarn install --immutable`、`caps verify --toolchain`、`calcit --check-only --all-defs`、`calcit fix --workflow strict --verify` 和 `calcit js`，再运行 `yarn vite`。生成的 `js-out/` 不进入仓库，不恢复 compact.cirru/package.cirru。
 
 0.31.0 候选使用已发布的 Space 0.0.46、Touch Control 0.0.34、Respo 0.17.0-alpha.4、
 Quaternion 0.2.17、Memof 0.0.41、js-ffi 0.2.7；Respo 仍为已发布 alpha 模块，
