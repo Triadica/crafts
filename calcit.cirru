@@ -5,7 +5,7 @@
   :entries $ {} $ :default
     {} (:description |) (:init-fn 'app.main/main!) (:mode :js) (:reload-fn 'app.main/reload!) (:target :browser)
       :feature-policy $ {}
-      :modules $ [] |touch-control/ |respo.calcit/ |triadica-space/ |quaternion/ |memof/
+      :modules $ [] |touch-control/ |respo.calcit/ |triadica-space/ |quaternion/
       :type-slots $ {}
   :files $ {}
     'app.comp.container $ %{} 'FileEntry
@@ -309,7 +309,9 @@
           :code $ quote $ defn comp-container (store)
             group ({})
               if (not hide-tabs?)
-                memof1-call-unary comp-demo-tabs $ :tab store
+                decode-map-as
+                  respo.memo/memo-value-by :header comp-demo-tabs $ :tab store
+                  Map Tag Dynamic
                 group $ {}
               match (:tab store)
                 :axis $ comp-axis
@@ -1125,7 +1127,6 @@
             triadica.comp.axis :refer $ comp-axis
             triadica.comp.drag-point :refer $ comp-button
             |simplex-noise :refer $ createNoise2D
-            memof.once :refer $ memof1-call-unary
             app.comp.jakc-tree :refer $ comp-jakc-tree
             triadica.comp.segments :refer $ comp-segments comp-segments-curves
             app.comp.snowflakes :refer $ comp-snowflakes-demo
@@ -1217,7 +1218,6 @@
             triadica.math :refer $ fibo-grid-range
             triadica.core :refer $ >>
             triadica.comp.line :refer $ comp-tube comp-brush comp-strip-light
-            memof.once :refer $ memof1-call
             triadica.comp.segments :refer $ comp-segments
             triadica.alias :refer $ object group
             app.config :refer $ inline-shader
@@ -1288,7 +1288,6 @@
           :require
             triadica.core :refer $ >>
             triadica.comp.line :refer $ comp-tube comp-brush comp-strip-light
-            memof.once :refer $ memof1-call
             triadica.comp.segments :refer $ comp-segments fibo-grid-range
             app.config :refer $ inline-shader
             triadica.vector :refer $ &v+ &v- v+ v-scale v-cross v-normalize v-length
@@ -1336,7 +1335,6 @@
             triadica.math :refer $ fibo-grid-range
             triadica.core :refer $ >>
             triadica.comp.line :refer $ comp-tube comp-brush comp-strip-light
-            memof.once :refer $ memof1-call
             triadica.comp.segments :refer $ comp-segments
             app.config :refer $ inline-shader
             triadica.vector :refer $ &v+ &v- v+ v-scale v-cross v-normalize v-length
@@ -1558,7 +1556,6 @@
           :require
             triadica.core :refer $ >>
             triadica.comp.line :refer $ comp-tube comp-brush comp-strip-light
-            memof.once :refer $ memof1-call
             triadica.comp.segments :refer $ comp-segments fibo-grid-range
             app.config :refer $ inline-shader
             |@calcit/std :refer $ rand rand-int rand-shift
@@ -1605,7 +1602,6 @@
             triadica.math :refer $ fibo-grid-range
             triadica.core :refer $ >>
             triadica.comp.line :refer $ comp-tube comp-brush comp-strip-light
-            memof.once :refer $ memof1-call
             triadica.comp.segments :refer $ comp-segments comp-segments-curves
             triadica.alias :refer $ object group
             app.config :refer $ inline-shader
@@ -1718,7 +1714,9 @@
           :schema $ quote $ Fn (-> Unit) (:features :js-ffi :state)
         'render-app! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn render-app! () (reset! *triangle-counter 0)
-            load-objects! (comp-container @*store) dispatch!
+            load-objects!
+              respo.memo/with-memo-frame $ fn () $ comp-container @*store
+              , dispatch!
             paint-canvas!
             , &unit
           :examples $ []
