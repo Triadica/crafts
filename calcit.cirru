@@ -1697,7 +1697,7 @@
             ; flipped js/setInterval 4000 $ fn () $ dispatch! :inc nil
             , &unit
           :examples $ []
-          :schema $ quote $ Fn (-> Unit) (:features :js-ffi :state)
+          :schema $ quote $ Fn (-> Unit) (:features :io :js-ffi :state)
         'reload! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn reload! ()
             if (nil? build-errors)
@@ -1711,11 +1711,13 @@
               hud! |error build-errors
             , &unit
           :examples $ []
-          :schema $ quote $ Fn (-> Unit) (:features :js-ffi :state)
+          :schema $ quote $ Fn (-> Unit) (:features :io :js-ffi :state)
         'render-app! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn render-app! () (reset! *triangle-counter 0)
             load-objects!
-              respo.memo/with-memo-frame $ fn () $ comp-container @*store
+              decode-map-as
+                respo.memo/with-memo-frame $ fn () $ comp-container @*store
+                Map Tag Dynamic
               , dispatch!
             paint-canvas!
             , &unit
