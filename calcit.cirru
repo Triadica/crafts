@@ -133,7 +133,7 @@
           :examples $ []
           :schema $ quote $ Fn
             -> $ Map Tag Dynamic
-            :features :js-ffi
+            :features :io :js-ffi
         'comp-christmas-tree-demo $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn comp-christmas-tree-demo ()
             comp-strip-light $ {}
@@ -172,7 +172,7 @@
           :examples $ []
           :schema $ quote $ Fn
             -> $ Map Tag Dynamic
-            :features :js-ffi
+            :features :io :js-ffi
         'comp-city-demo $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn comp-city-demo ()
             let
@@ -304,7 +304,7 @@
           :examples $ []
           :schema $ quote $ Fn
             -> $ Map Tag Dynamic
-            :features :js-ffi
+            :features :io :js-ffi
         'comp-container $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn comp-container (store)
             group ({})
@@ -346,7 +346,7 @@
           :examples $ []
           :schema $ quote $ Fn app.schema/Store
             -> $ Map Tag Dynamic
-            :features :js-ffi :state
+            :features :io :js-ffi :state
         'comp-demo-tabs $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn comp-demo-tabs (selected)
             comp-tabs tab-entries
@@ -440,7 +440,7 @@
           :examples $ []
           :schema $ quote $ Fn
             -> $ Map Tag Dynamic
-            :features :js-ffi
+            :features :io :js-ffi
         'comp-mesh-demo $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn comp-mesh-demo ()
             let
@@ -491,7 +491,7 @@
           :examples $ []
           :schema $ quote $ Fn
             -> $ Map Tag Dynamic
-            :features :js-ffi :state
+            :features :io :js-ffi :state
         'comp-mooncake-demo $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn comp-mooncake-demo ()
             object $ {} (:draw-mode :triangles)
@@ -555,7 +555,7 @@
           :examples $ []
           :schema $ quote $ Fn
             -> $ Map Tag Dynamic
-            :features :js-ffi
+            :features :io :js-ffi
         'comp-rings-demo $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn comp-rings-demo ()
             comp-brush $ {} (:draw-mode :triangles) (:circle-step 20) (:radius 2)
@@ -639,7 +639,7 @@
           :examples $ []
           :schema $ quote $ Fn
             -> $ Map Tag Dynamic
-            :features :js-ffi
+            :features :io :js-ffi
         'comp-spiral-branches-demo $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn comp-spiral-branches-demo ()
             comp-strip-light $ {}
@@ -679,7 +679,7 @@
           :examples $ []
           :schema $ quote $ Fn
             -> $ Map Tag Dynamic
-            :features :js-ffi
+            :features :io :js-ffi
         'comp-spiral-tree-demo $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn comp-spiral-tree-demo ()
             comp-strip-light $ {}
@@ -726,7 +726,7 @@
           :examples $ []
           :schema $ quote $ Fn
             -> $ Map Tag Dynamic
-            :features :js-ffi
+            :features :io :js-ffi
         'comp-tube-demo $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn comp-tube-demo ()
             let
@@ -760,7 +760,7 @@
           :examples $ []
           :schema $ quote $ Fn
             -> $ Map Tag Dynamic
-            :features :js-ffi
+            :features :io :js-ffi
         'comp-wistaria-demo $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn comp-wistaria-demo ()
             let
@@ -848,7 +848,7 @@
           :examples $ []
           :schema $ quote $ Fn
             -> $ Map Tag Dynamic
-            :features :js-ffi
+            :features :io :js-ffi
         'connect-pieces $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn connect-pieces (dots middle)
             ->
@@ -1169,7 +1169,7 @@
           :examples $ []
           :schema $ quote $ Fn
             -> $ Map Tag Dynamic
-            :features :js-ffi
+            :features :io :js-ffi
         'draw-umbrella $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn draw-umbrella (origin p)
             let
@@ -1208,6 +1208,7 @@
           :examples $ []
           :schema $ quote $ Fn (List Number) (List Number)
             -> $ List app.schema/SegmentTree
+            :features :io
         'up $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def up ([] 0 1 0)
           :examples $ []
@@ -1242,7 +1243,7 @@
           :examples $ []
           :schema $ quote $ Fn
             -> $ Map Tag Dynamic
-            :features :js-ffi
+            :features :io :js-ffi
         'make-dense-branch $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn make-dense-branch
             origin base v0 branch-ratio size total-pitch total-angle r1 level
@@ -1283,6 +1284,7 @@
           :examples $ []
           :schema $ quote $ Fn (List Number) (List Number) (List Number) Number Number Number Number Number Number
             -> $ List app.schema/SegmentTree
+            :features :io
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns app.comp.dense-tree
           :require
@@ -1426,7 +1428,7 @@
           :examples $ []
           :schema $ quote $ Fn
             -> $ Map Tag Dynamic
-            :features :js-ffi
+            :features :io :js-ffi
         'rotate-branches $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn rotate-branches (branch0)
             loop
@@ -1722,7 +1724,7 @@
             paint-canvas!
             , &unit
           :examples $ []
-          :schema $ quote $ Fn (-> Unit) (:features :js-ffi :state)
+          :schema $ quote $ Fn (-> Unit) (:features :io :js-ffi :state)
         'update-store $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn update-store (store op)
             match op
