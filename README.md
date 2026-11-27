@@ -2,11 +2,11 @@
 
 - Demo https://r.tiye.me/Triadica/crafts/
 
-### Calcit 0.45.1 使用说明
+### Calcit 0.46.0 使用说明
 
-升级请配套使用正式 Calcit 和 `@calcit/procs` 0.45.1 及 Space 0.0.55，
+升级请配套使用正式 Calcit 和 `@calcit/procs` 0.46.0 及 Space 0.0.56，
 重装依赖后重新生成 JS。Quaternion 零长度向量诊断的调用链声明 `:io`；场景切换、计数和旧游标事件沿用原格式。
-更新器使用具名 `Op`，游标状态仍允许控件存入自己的数据。 本次 0.45.1 升级通过 276 个定义、完整 strict、原四项测试及构建；尚未复验浏览器场景。
+更新器使用具名 `Op`，游标状态仍允许控件存入自己的数据。 升级后需重新验证类型、测试和浏览器场景。
 
 ### 历史：Calcit 0.31.0
 
@@ -19,7 +19,7 @@ Space 0.0.46 / js-ffi 0.2.7，旧版 canvas 合同阻塞已在本项目实际页
 
 https://github.com/Triadica/triadica-workflow
 
-源码使用 `calcit.cirru` 与 `deps.cirru`，Calcit / `@calcit/procs` 固定为正式版 `0.45.1`。使用 Node 24、Yarn 4.18，依次运行 `caps --strict --ci`、`yarn install --immutable`、`caps verify --toolchain`、`calcit --check-only --all-defs`、`calcit fix --workflow strict --verify` 和 `calcit js`，再运行 `yarn vite`。生成的 `js-out/` 不进入仓库，不恢复 compact.cirru/package.cirru。
+源码使用 `calcit.cirru` 与 `deps.cirru`，Calcit / `@calcit/procs` 固定为正式版 `0.46.0`。使用 Node 24、Yarn 4.18，依次运行 `caps --strict --ci`、`yarn install --immutable`、`caps verify --toolchain`、`calcit --check-only --all-defs`、`calcit fix --workflow strict --verify` 和 `calcit js`，再运行 `yarn vite`。生成的 `js-out/` 不进入仓库，不恢复 compact.cirru/package.cirru。
 
 场景树在 memo frame 的类型擦除边界做一次 Map 解码；上游泛型回调合同问题见 [Respo #381](https://github.com/Respo/respo.calcit/issues/381)。
 
